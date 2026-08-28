@@ -1,0 +1,42 @@
+name: Bug report
+description: 使用最小合成案例报告可重现的问题。
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        安全问题先阅读 SECURITY.md。不要上传公司图片、患者信息、数据库、密钥或完整环境日志。
+  - type: textarea
+    id: environment
+    attributes:
+      label: 运行环境
+      description: 项目版本或 commit、Python、操作系统；涉及 OCR 时附 Tesseract 版本。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现步骤
+      description: 给出最少步骤和可重生成的合成输入，不附真实业务数据。
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期结果
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际结果
+      description: 只贴相关输出，去掉个人路径、令牌和其他可识别信息。
+    validations:
+      required: true
+  - type: checkboxes
+    id: data_safety
+    attributes:
+      label: 数据检查
+      options:
+        - label: 我提供的复现材料仅包含合成数据，没有凭据或可识别信息。
+          required: true

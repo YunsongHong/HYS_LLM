@@ -1,0 +1,314 @@
+{
+  "schema_version": 1,
+  "inventory_name": "ParamGuard Vision minimal observed supply-chain registry",
+  "scope": "Observed development and OCR runtime artifacts; excludes build-only tooling, operating-system frameworks, and exhaustive transitive closure.",
+  "verified_on": "2026-08-25",
+  "components": [
+    {
+      "id": "python-runtime",
+      "name": "CPython",
+      "artifact_kind": "PYTHON_RUNTIME",
+      "project_relation": "RUNTIME_PREREQUISITE",
+      "observed_version": "3.13.2",
+      "license_spdx": "PSF-2.0",
+      "verification_status": "VERIFIED",
+      "runtime_required": true,
+      "source_url": "https://github.com/python/cpython/tree/v3.13.2",
+      "license_source_url": "https://github.com/python/cpython/blob/v3.13.2/LICENSE",
+      "observation_method": "platform.python_version and SHA-256 of sys.executable",
+      "scope_note": "Primary CPython license only; incorporated component terms remain in the upstream LICENSE.",
+      "integrity": {
+        "method": "SHA256",
+        "value": "866e723f721119dc74a98c62fca2209db6cc9ef3f6b1ad3e6f751c58af2bb095"
+      }
+    },
+    {
+      "id": "pillow",
+      "name": "Pillow",
+      "artifact_kind": "PYTHON_PACKAGE",
+      "project_relation": "DIRECT_DEPENDENCY",
+      "observed_version": "12.2.0",
+      "license_spdx": "MIT-CMU",
+      "verification_status": "VERIFIED",
+      "runtime_required": true,
+      "source_url": "https://github.com/python-pillow/Pillow/tree/12.2.0",
+      "license_source_url": "https://github.com/python-pillow/Pillow/blob/12.2.0/LICENSE",
+      "observation_method": "importlib.metadata version and SHA-256 of installed distribution RECORD",
+      "scope_note": "The installed wheel license bundle can include additional codec notices; preserve that bundle when redistributing.",
+      "integrity": {
+        "method": "SHA256",
+        "value": "e55e144b5b31998be2ed5721f1bc4cc59137818de1631aabe1156aa42f10adff"
+      }
+    },
+    {
+      "id": "pillow-embedded-aileron",
+      "name": "Aileron Regular subset",
+      "artifact_kind": "EMBEDDED_ASSET",
+      "project_relation": "EMBEDDED_ASSET",
+      "observed_version": "1.102",
+      "license_spdx": "CC0-1.0",
+      "verification_status": "VERIFIED",
+      "runtime_required": true,
+      "source_url": "https://github.com/python-pillow/Pillow/blob/12.2.0/src/PIL/ImageFont.py",
+      "license_source_url": "https://github.com/python-pillow/Pillow/pull/7354",
+      "observation_method": "Decoded ImageFont.load_default asset, inspected OpenType name table, and hashed exact embedded bytes",
+      "scope_note": "Separate from Pillow's MIT-CMU code license; ParamGuard calls load_default and emits rasterized glyphs, not a standalone font file.",
+      "integrity": {
+        "method": "SHA256",
+        "value": "69853909b940023570964e29cffe30da95aea8de3627736b5cd15ab30143169f"
+      }
+    },
+    {
+      "id": "tesseract-cli",
+      "name": "Tesseract OCR",
+      "artifact_kind": "CLI",
+      "project_relation": "RUNTIME_PREREQUISITE",
+      "observed_version": "5.5.1",
+      "license_spdx": "Apache-2.0",
+      "verification_status": "VERIFIED",
+      "runtime_required": true,
+      "source_url": "https://github.com/tesseract-ocr/tesseract/tree/5.5.1",
+      "license_source_url": "https://github.com/tesseract-ocr/tesseract/blob/5.5.1/LICENSE",
+      "observation_method": "tesseract --version and SHA-256 of the resolved executable",
+      "scope_note": "The engine has separate native and trained-data dependencies recorded below.",
+      "integrity": {
+        "method": "SHA256",
+        "value": "86c6789d10699f3ab2931c907bf9d2725b3bdc53eb6b7ed9ce3b33bd0f6a1767"
+      }
+    },
+    {
+      "id": "tessdata-eng",
+      "name": "eng",
+      "artifact_kind": "LANGUAGE_DATA",
+      "project_relation": "MODEL_DATA",
+      "observed_version": "tessdata_fast-4.1.0",
+      "license_spdx": "Apache-2.0",
+      "verification_status": "VERIFIED",
+      "runtime_required": true,
+      "source_url": "https://github.com/tesseract-ocr/tessdata_fast/blob/4.1.0/eng.traineddata",
+      "license_source_url": "https://github.com/tesseract-ocr/tessdata_fast/blob/4.1.0/LICENSE",
+      "observation_method": "tesseract --list-langs, installed artifact SHA-256, and package formula source pin",
+      "scope_note": "This is the only language explicitly selected by ParamGuard's default OCR configuration.",
+      "integrity": {
+        "method": "UPSTREAM_SHA256",
+        "value": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2"
+      }
+    },
+    {
+      "id": "tessdata-osd",
+      "name": "osd",
+      "artifact_kind": "LANGUAGE_DATA",
+      "project_relation": "MODEL_DATA",
+      "observed_version": "tessdata_fast-4.1.0",
+      "license_spdx": "Apache-2.0",
+      "verification_status": "VERIFIED",
+      "runtime_required": false,
+      "source_url": "https://github.com/tesseract-ocr/tessdata_fast/blob/4.1.0/osd.traineddata",
+      "license_source_url": "https://github.com/tesseract-ocr/tessdata_fast/blob/4.1.0/LICENSE",
+      "observation_method": "tesseract --list-langs, installed artifact SHA-256, and package formula source pin",
+      "scope_note": "Installed and therefore inventoried, but not selected by ParamGuard's current OCR configuration.",
+      "integrity": {
+        "method": "UPSTREAM_SHA256",
+        "value": "9cf5d576fcc47564f11265841e5ca839001e7e6f38ff7f7aacf46d15a96b00ff"
+      }
+    },
+    {
+      "id": "tessdata-snum",
+      "name": "snum",
+      "artifact_kind": "LANGUAGE_DATA",
+      "project_relation": "MODEL_DATA",
+      "observed_version": "source-commit-319a6eeacff1",
+      "license_spdx": "UNKNOWN",
+      "verification_status": "NEEDS_REVIEW",
+      "runtime_required": false,
+      "source_url": "https://github.com/USCDataScience/counterfeit-electronics-tesseract/blob/319a6eeacff181dad5c02f3e7a3aff804eaadeca/Training%20Tesseract/snum.traineddata",
+      "license_source_url": "https://github.com/USCDataScience/counterfeit-electronics-tesseract",
+      "observation_method": "tesseract --list-langs, installed artifact SHA-256, repository metadata, and package formula source pin",
+      "scope_note": "The source repository exposes no root license; do not redistribute or enable this inactive model until reviewed or removed from a controlled runtime.",
+      "integrity": {
+        "method": "UPSTREAM_SHA256",
+        "value": "36f772980ff17c66a767f584a0d80bf2302a1afa585c01a226c1863afcea1392"
+      }
+    },
+    {
+      "id": "leptonica",
+      "name": "Leptonica",
+      "artifact_kind": "NATIVE_LIBRARY",
+      "project_relation": "TRANSITIVE_RUNTIME",
+      "observed_version": "1.85.0",
+      "license_spdx": "BSD-2-Clause",
+      "verification_status": "VERIFIED",
+      "runtime_required": true,
+      "source_url": "https://github.com/DanBloomberg/leptonica/tree/1.85.0",
+      "license_source_url": "https://github.com/DanBloomberg/leptonica/blob/1.85.0/leptonica-license.txt",
+      "observation_method": "Version pair reported by tesseract --version",
+      "scope_note": "Primary Tesseract image-processing library; standalone native artifact digest was not captured.",
+      "integrity": {
+        "method": "VERSION_REPORT_ONLY",
+        "value": "Tesseract self-report; no standalone native artifact digest captured"
+      }
+    },
+    {
+      "id": "giflib",
+      "name": "giflib",
+      "artifact_kind": "NATIVE_LIBRARY",
+      "project_relation": "TRANSITIVE_RUNTIME",
+      "observed_version": "5.2.2",
+      "license_spdx": "MIT",
+      "verification_status": "VERIFIED",
+      "runtime_required": true,
+      "source_url": "https://giflib.sourceforge.net/",
+      "license_source_url": "https://sourceforge.net/p/giflib/code/ci/5.2.2/tree/COPYING?format=raw",
+      "observation_method": "Version pair reported by tesseract --version; package license cross-check",
+      "scope_note": "Image codec reported through Leptonica; standalone native artifact digest was not captured.",
+      "integrity": {
+        "method": "VERSION_REPORT_ONLY",
+        "value": "Tesseract self-report; no standalone native artifact digest captured"
+      }
+    },
+    {
+      "id": "libjpeg-turbo",
+      "name": "libjpeg-turbo",
+      "artifact_kind": "NATIVE_LIBRARY",
+      "project_relation": "TRANSITIVE_RUNTIME",
+      "observed_version": "3.0.4",
+      "license_spdx": "IJG AND Zlib AND BSD-3-Clause",
+      "verification_status": "VERIFIED",
+      "runtime_required": true,
+      "source_url": "https://github.com/libjpeg-turbo/libjpeg-turbo/tree/3.0.4",
+      "license_source_url": "https://github.com/libjpeg-turbo/libjpeg-turbo/blob/3.0.4/LICENSE.md",
+      "observation_method": "Version pair reported by tesseract --version",
+      "scope_note": "Official license roll-up applies multiple compatible terms; standalone native artifact digest was not captured.",
+      "integrity": {
+        "method": "VERSION_REPORT_ONLY",
+        "value": "Tesseract self-report; no standalone native artifact digest captured"
+      }
+    },
+    {
+      "id": "libpng",
+      "name": "libpng",
+      "artifact_kind": "NATIVE_LIBRARY",
+      "project_relation": "TRANSITIVE_RUNTIME",
+      "observed_version": "1.6.58",
+      "license_spdx": "libpng-2.0",
+      "verification_status": "VERIFIED",
+      "runtime_required": true,
+      "source_url": "https://github.com/pnggroup/libpng/tree/v1.6.58",
+      "license_source_url": "https://github.com/pnggroup/libpng/blob/v1.6.58/LICENSE",
+      "observation_method": "Version pair reported by tesseract --version",
+      "scope_note": "PNG codec reported through Leptonica; individual contrib files may carry additional compatible terms.",
+      "integrity": {
+        "method": "VERSION_REPORT_ONLY",
+        "value": "Tesseract self-report; no standalone native artifact digest captured"
+      }
+    },
+    {
+      "id": "libtiff",
+      "name": "libtiff",
+      "artifact_kind": "NATIVE_LIBRARY",
+      "project_relation": "TRANSITIVE_RUNTIME",
+      "observed_version": "4.7.0",
+      "license_spdx": "libtiff",
+      "verification_status": "VERIFIED",
+      "runtime_required": true,
+      "source_url": "https://gitlab.com/libtiff/libtiff/-/tree/v4.7.0",
+      "license_source_url": "https://gitlab.com/libtiff/libtiff/-/blob/v4.7.0/LICENSE.md",
+      "observation_method": "Version pair reported by tesseract --version",
+      "scope_note": "TIFF codec reported through Leptonica; standalone native artifact digest was not captured.",
+      "integrity": {
+        "method": "VERSION_REPORT_ONLY",
+        "value": "Tesseract self-report; no standalone native artifact digest captured"
+      }
+    },
+    {
+      "id": "zlib",
+      "name": "zlib",
+      "artifact_kind": "NATIVE_LIBRARY",
+      "project_relation": "TRANSITIVE_RUNTIME",
+      "observed_version": "1.2.12",
+      "license_spdx": "Zlib",
+      "verification_status": "VERIFIED",
+      "runtime_required": true,
+      "source_url": "https://github.com/madler/zlib/tree/v1.2.12",
+      "license_source_url": "https://github.com/madler/zlib/blob/v1.2.12/zlib.h",
+      "observation_method": "Version pair reported by tesseract --version",
+      "scope_note": "Compression library version is Tesseract's self-report, not a package-manager assertion.",
+      "integrity": {
+        "method": "VERSION_REPORT_ONLY",
+        "value": "Tesseract self-report; no standalone native artifact digest captured"
+      }
+    },
+    {
+      "id": "libwebp",
+      "name": "libwebp",
+      "artifact_kind": "NATIVE_LIBRARY",
+      "project_relation": "TRANSITIVE_RUNTIME",
+      "observed_version": "1.5.0",
+      "license_spdx": "BSD-3-Clause",
+      "verification_status": "VERIFIED",
+      "runtime_required": true,
+      "source_url": "https://github.com/webmproject/libwebp/tree/v1.5.0",
+      "license_source_url": "https://github.com/webmproject/libwebp/blob/v1.5.0/COPYING",
+      "observation_method": "Version pair reported by tesseract --version",
+      "scope_note": "The GitHub repository is an official mirror of the canonical Chromium-hosted source.",
+      "integrity": {
+        "method": "VERSION_REPORT_ONLY",
+        "value": "Tesseract self-report; no standalone native artifact digest captured"
+      }
+    },
+    {
+      "id": "openjpeg",
+      "name": "OpenJPEG",
+      "artifact_kind": "NATIVE_LIBRARY",
+      "project_relation": "TRANSITIVE_RUNTIME",
+      "observed_version": "2.5.3",
+      "license_spdx": "BSD-2-Clause",
+      "verification_status": "VERIFIED",
+      "runtime_required": true,
+      "source_url": "https://github.com/uclouvain/openjpeg/tree/v2.5.3",
+      "license_source_url": "https://github.com/uclouvain/openjpeg/blob/v2.5.3/LICENSE",
+      "observation_method": "libopenjp2 version pair reported by tesseract --version",
+      "scope_note": "JPEG 2000 codec reported through Leptonica; upstream currently describes the repository as unmaintained.",
+      "integrity": {
+        "method": "VERSION_REPORT_ONLY",
+        "value": "Tesseract self-report; no standalone native artifact digest captured"
+      }
+    },
+    {
+      "id": "libarchive",
+      "name": "libarchive",
+      "artifact_kind": "NATIVE_LIBRARY",
+      "project_relation": "TRANSITIVE_RUNTIME",
+      "observed_version": "3.8.0",
+      "license_spdx": "BSD-2-Clause",
+      "verification_status": "VERIFIED",
+      "runtime_required": true,
+      "source_url": "https://github.com/libarchive/libarchive/tree/v3.8.0",
+      "license_source_url": "https://github.com/libarchive/libarchive/blob/v3.8.0/COPYING",
+      "observation_method": "Version pair reported by tesseract --version",
+      "scope_note": "Package-level default only; official COPYING says individual files control and some use other terms.",
+      "integrity": {
+        "method": "VERSION_REPORT_ONLY",
+        "value": "Tesseract self-report; no standalone native artifact digest captured"
+      }
+    },
+    {
+      "id": "libcurl",
+      "name": "libcurl",
+      "artifact_kind": "NATIVE_LIBRARY",
+      "project_relation": "TRANSITIVE_RUNTIME",
+      "observed_version": "8.7.1",
+      "license_spdx": "curl",
+      "verification_status": "VERIFIED",
+      "runtime_required": true,
+      "source_url": "https://github.com/curl/curl/tree/curl-8_7_1",
+      "license_source_url": "https://github.com/curl/curl/blob/curl-8_7_1/COPYING",
+      "observation_method": "Version pair reported by tesseract --version",
+      "scope_note": "Package-level upstream license; operating-system vendor patch provenance is outside this minimal registry.",
+      "integrity": {
+        "method": "VERSION_REPORT_ONLY",
+        "value": "Tesseract self-report; no standalone native artifact digest captured"
+      }
+    }
+  ]
+}

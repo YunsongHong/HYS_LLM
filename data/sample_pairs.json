@@ -1,0 +1,77 @@
+{
+  "schema_version": "demo-1.0",
+  "description": "Synthetic IT/OT parameter pairs for learning. No real company data.",
+  "pairs": [
+    {
+      "parameter_id": "TEMP_SETPOINT",
+      "label": "Temperature setpoint",
+      "left": "37.0 °C",
+      "right": "37.0 °C",
+      "critical": true
+    },
+    {
+      "parameter_id": "PH_TARGET",
+      "label": "pH target",
+      "left": "7.20",
+      "right": "7.25",
+      "critical": true
+    },
+    {
+      "parameter_id": "SENSOR_OFFSET",
+      "label": "Sensor offset",
+      "left": "-0.5 °C",
+      "right": "0.5 °C",
+      "critical": true
+    },
+    {
+      "parameter_id": "DOSAGE_UNIT",
+      "label": "Dosage",
+      "left": "10 mg",
+      "right": "10 μg",
+      "critical": true
+    },
+    {
+      "parameter_id": "FLOW_RATE",
+      "label": "Flow rate",
+      "left": "025.0 L/min",
+      "right": "25.0 L/min",
+      "critical": false
+    },
+    {
+      "parameter_id": "PRECISION_DISPLAY",
+      "label": "Displayed precision",
+      "left": "1.0 bar",
+      "right": "1.00 bar",
+      "critical": false
+    },
+    {
+      "parameter_id": "CONTROL_MODE",
+      "label": "Control mode",
+      "left": "AUTO",
+      "right": "auto",
+      "critical": false
+    },
+    {
+      "parameter_id": "VALVE_STATE",
+      "label": "Valve state",
+      "left": "CLOSED",
+      "right": "CLOSEO",
+      "critical": true
+    },
+    {
+      "parameter_id": "ALARM_DELAY",
+      "label": "Alarm delay",
+      "left": "5 s",
+      "right": null,
+      "critical": true
+    },
+    {
+      "parameter_id": "UV_LIMIT",
+      "label": "UV absorbance limit",
+      "left": "0.020 AU",
+      "right": "0.020 AU",
+      "critical": false
+    }
+  ]
+}
+

@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ParamGuard — 人工首检</title>
+  <style nonce="{{CSP_NONCE}}">
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      --ink: #17212b;
+      --muted: #53616e;
+      --line: #ccd3da;
+      --panel: #ffffff;
+      --canvas: #f4f6f8;
+      --action: #173f67;
+      --focus: #1967a5;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--canvas); color: var(--ink); }
+    main { max-width: 1220px; margin: 0 auto; padding: 24px; }
+    .notice, .instructions, .field-card {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    }
+    .notice { padding: 15px 18px; border-left: 6px solid #5a6875; }
+    .instructions { margin: 18px 0; padding: 16px 18px; }
+    .evidence-pair, .roi-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    figure { margin: 0; }
+    figcaption { margin-bottom: 7px; color: var(--muted); font-weight: 700; }
+    .evidence-pair img { display: block; width: 100%; border: 1px solid var(--line); border-radius: 8px; }
+    .field-card { margin-top: 16px; padding: 18px; outline: none; }
+    .field-card:focus, .field-card.current { box-shadow: 0 0 0 3px rgba(25,103,165,.25); border-color: var(--focus); }
+    .field-card h3 { margin-top: 0; }
+    .roi-pair img { width: 100%; min-height: 72px; object-fit: contain; border: 1px solid var(--line); background: white; }
+    label { display: block; margin-top: 13px; color: var(--muted); }
+    input.reason { display: block; width: 100%; margin-top: 6px; padding: 10px; border: 1px solid #9aa5af; border-radius: 7px; }
+    .verdicts { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
+    button { padding: 10px 14px; border-radius: 7px; border: 1px solid #77838e; background: #fff; color: var(--ink); font-weight: 700; cursor: pointer; }
+    button:hover, button:focus-visible { outline: 3px solid rgba(25,103,165,.25); }
+    button.selected { border-width: 3px; border-color: var(--action); }
+    button.primary { background: var(--action); color: #fff; border-color: var(--action); }
+    button:disabled { cursor: not-allowed; opacity: .48; }
+    .decision-status { color: var(--muted); margin-bottom: 0; }
+    .footer-actions { position: sticky; bottom: 0; margin-top: 20px; padding: 16px; background: rgba(244,246,248,.96); border-top: 1px solid var(--line); }
+    .error { color: #8b1e1e; font-weight: 700; }
+    code { overflow-wrap: anywhere; }
+    @media (max-width: 760px) {
+      .evidence-pair, .roi-pair { grid-template-columns: 1fr; }
+      main { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>ParamGuard 人工首检</h1>
+  <section class="notice">
+    <strong>当前只是人工首检阶段。</strong>
+    请仅根据下方两份合成证据独立判断；完成所有字段后才能锁定。
+  </section>
+
+  <section class="instructions">
+    <h2>怎么操作</h2>
+    <p>点选一个字段后，可按 <kbd>S</kbd> = 相同、<kbd>D</kbd> = 不同、<kbd>U</kbd> = 无法判断。“不同”或“无法判断”必须填写理由。</p>
+  </section>
+
+  <section aria-label="完整合成证据" class="evidence-pair">
+    <figure>
+      <figcaption>照片 A</figcaption>
+      <img src="/evidence/left/full.png" alt="待核对的合成照片 A">
+    </figure>
+    <figure>
+      <figcaption>截图 A′</figcaption>
+      <img src="/evidence/right/full.png" alt="待核对的合成截图 A′">
+    </figure>
+  </section>
+
+  <section id="field-list" aria-label="逐字段人工核对">
+    {{FIELD_ROWS}}
+  </section>
+
+  <section class="footer-actions">
+    <p id="completion-status" role="status">请先完成每个字段的人工判定。</p>
+    <p id="request-error" class="error" role="alert"></p>
+    <button id="lock-review" class="primary" type="button" disabled>锁定完整人工首检</button>
+  </section>
+  <p>学习 PoC；仅使用合成数据；不是经过验证的生产系统。</p>
+</main>
+
+<script id="bootstrap" type="application/json" nonce="{{CSP_NONCE}}">{{BOOTSTRAP_JSON}}</script>
+<script nonce="{{CSP_NONCE}}">
+(() => {
+  const bootstrap = JSON.parse(document.getElementById('bootstrap').textContent);
+  let revision = bootstrap.revision;
+  const cards = Array.from(document.querySelectorAll('.field-card'));
+  const cardsById = new Map(cards.map(card => [card.dataset.parameterId, card]));
+  let currentCard = cards[0] || null;
+  const errorBox = document.getElementById('request-error');
+  const lockButton = document.getElementById('lock-review');
+  const completion = document.getElementById('completion-status');
+  let mutationPending = false;
+
+  function setCurrent(card) {
+    if (currentCard) currentCard.classList.remove('current');
+    currentCard = card;
+    card.classList.add('current');
+  }
+
+  function applyState(state) {
+    revision = state.revision;
+    const byId = new Map(state.fields.map(field => [field.parameter_id, field]));
+    cards.forEach(card => {
+      const field = byId.get(card.dataset.parameterId);
+      const status = card.querySelector('.decision-status');
+      card.querySelectorAll('[data-verdict]').forEach(button => button.classList.remove('selected'));
+      if (field.decision === null) {
+        status.textContent = '未记录';
+        return;
+      }
+      const selected = card.querySelector(`[data-verdict="${field.decision.verdict}"]`);
+      if (selected) selected.classList.add('selected');
+      card.querySelector('.reason').value = field.decision.reason || '';
+      status.textContent = `已记录：${field.decision.verdict}`;
+    });
+    lockButton.disabled = !state.lock_available;
+    completion.textContent = state.lock_available
+      ? '全部字段已有人工判定，现在可以锁定。'
+      : `还有 ${state.missing_count} 个字段需要人工判定。`;
+  }
+
+  function applyReceipt(receipt) {
+    revision = receipt.revision;
+    const decision = receipt.decision;
+    const card = cardsById.get(decision.parameter_id);
+    if (!card) throw new Error('UNKNOWN_RECEIPT_FIELD');
+    card.querySelectorAll('[data-verdict]').forEach(button => button.classList.remove('selected'));
+    const selected = card.querySelector(`[data-verdict="${decision.verdict}"]`);
+    if (!selected) throw new Error('UNKNOWN_RECEIPT_VERDICT');
+    selected.classList.add('selected');
+    card.querySelector('.reason').value = decision.reason || '';
+    card.querySelector('.decision-status').textContent = `已记录：${decision.verdict}`;
+    lockButton.disabled = !receipt.lock_available;
+    completion.textContent = receipt.lock_available
+      ? '全部字段已有人工判定，现在可以锁定。'
+      : `还有 ${receipt.missing_count} 个字段需要人工判定。`;
+  }
+
+  function commandId(prefix) {
+    const value = globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function'
+      ? globalThis.crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    return `${prefix}-${value}`;
+  }
+
+  async function post(path, body, retryNetworkOnce = false) {
+    errorBox.textContent = '';
+    let response;
+    try {
+      response = await fetch(path, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+      });
+    } catch (error) {
+      if (!retryNetworkOnce) throw error;
+      response = await fetch(path, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+      });
+    }
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'REQUEST_FAILED');
+    return result;
+  }
+
+  async function record(card, verdict) {
+    if (mutationPending) return;
+    const reasonText = card.querySelector('.reason').value.trim();
+    if (verdict !== 'SAME' && reasonText.length === 0) {
+      errorBox.textContent = '该判定必须先填写理由。';
+      card.querySelector('.reason').focus();
+      return;
+    }
+    mutationPending = true;
+    try {
+      const result = await post('/api/decision', {
+        parameter_id: card.dataset.parameterId,
+        verdict,
+        reason: verdict === 'SAME' ? null : reasonText,
+        evidence_manifest_hash: bootstrap.evidence_manifest_hash,
+        expected_revision: revision,
+        command_id: commandId('first-review-decision')
+      }, true);
+      applyReceipt(result.receipt);
+    } catch (_) {
+      errorBox.textContent = '操作未保存；页面可能已过期，请重新加载后核对。';
+    } finally {
+      mutationPending = false;
+    }
+  }
+
+  cards.forEach(card => {
+    card.addEventListener('click', () => setCurrent(card));
+    card.addEventListener('focus', () => setCurrent(card));
+    card.querySelectorAll('[data-verdict]').forEach(button => {
+      button.addEventListener('click', () => record(card, button.dataset.verdict));
+    });
+  });
+
+  document.addEventListener('keydown', event => {
+    if (!currentCard || event.metaKey || event.ctrlKey || event.altKey) return;
+    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+    const verdict = {s: 'SAME', d: 'DIFFERENT', u: 'UNABLE_TO_JUDGE'}[event.key.toLowerCase()];
+    if (!verdict) return;
+    event.preventDefault();
+    record(currentCard, verdict);
+  });
+
+  lockButton.addEventListener('click', async () => {
+    if (mutationPending) return;
+    mutationPending = true;
+    lockButton.disabled = true;
+    try {
+      const result = await post('/api/lock', {
+        evidence_manifest_hash: bootstrap.evidence_manifest_hash,
+        expected_revision: revision,
+        command_id: commandId('first-review-lock')
+      }, true);
+      window.location.assign(result.next);
+    } catch (_) {
+      errorBox.textContent = '无法锁定：请确认每个字段都已保存，且页面不是过期副本。';
+      lockButton.disabled = false;
+      mutationPending = false;
+    }
+  });
+
+  if (currentCard) setCurrent(currentCard);
+  applyState(bootstrap);
+})();
+</script>
+</body>
+</html>

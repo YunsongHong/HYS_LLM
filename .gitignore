@@ -1,0 +1,44 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+dist/
+build/
+*.egg-info/
+.DS_Store
+
+# Local runs and generated evidence stay on this machine.
+/artifacts/
+# Local maintenance instructions, research logs and personal preparation notes.
+/AGENTS.md
+/docs/BACKGROUND_PROGRESS.md
+/docs/GITHUB_LANDSCAPE.md
+/docs/PUBLIC_DATA_CANDIDATES.md
+/docs/INTERVIEW_NARRATIVE.md
+.coverage
+htmlcov/
+.ruff_cache/
+.mypy_cache/
+
+# Local secrets and credentials; sanitized examples may be versioned.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+/credentials/
+/secrets/
+
+# Local databases and SQLite sidecar files.
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm

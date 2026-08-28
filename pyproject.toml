@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "paramguard-vision"
+version = "0.1.0"
+description = "Human-first parameter reconciliation learning project"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "Pillow>=10.1,<13",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+paramguard = ["static/*.html", "migrations/*.sql"]
