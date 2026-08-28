@@ -36,14 +36,18 @@ jobs:
       - name: Install the project
         run: python -m pip install --disable-pip-version-check --no-input .
 
-      - name: Verify the installed Web template is packaged
+      - name: Verify both installed Web templates are packaged
         run: >-
           python -c "from importlib.resources import files;
-          template = files('paramguard').joinpath('static', 'paramguard.html');
-          assert template.is_file(), 'installed Web template is missing'"
+          root = files('paramguard').joinpath('static');
+          assert all(root.joinpath(name).is_file() for name in
+          ('paramguard.html', 'assisted.html')), 'installed Web template is missing'"
 
       - name: Compile source and tests
-        run: python -m compileall -q src tests
+        run: python -m compileall -q src tests tools
+
+      - name: Check the workbench's asynchronous UI behavior
+        run: node tools/check_assisted_ui.mjs
 
       - name: Run all unit, adversarial, and integration tests
         env:

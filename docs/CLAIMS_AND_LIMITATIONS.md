@@ -21,7 +21,7 @@
 | 数据 | “演示和测试使用纯合成数据” | “在真实企业数据上验证” | 未获得或使用真实公司数据 |
 | 法规参考 | “设计参考了 FDA/eCFR、EU GMP、ICH、PIC/S 和 NIST 的官方来源，并区分法规、指南和草案” | “已通过 FDA”、“Part 11 certified”、“Annex 11 validated”、“GxP compliant” | 引用法规不等于适用性评估、组织验证或监管批准 |
 | Annex 22 | “将 2025 年 EU Annex 22 征求意见草案仅作前瞻性设计参考” | “Annex 22 已生效”、“法规强制 LLM 必须按本项目流程工作” | 官方页面在 2026-08-25 显示的是已结束征求意见，不是定稿 Annex |
-| Human-first | “项目以后端状态门强制首审员先独立完成并锁定，再显示 AI 辅助结果” | “所有 GxP 法规都要求人工必须先于 AI” | 这是本项目针对题设的风险控制；现行 Annex 11 不规定该特定先后顺序 |
+| Human-first | “默认严格流程以后端状态门强制首审员先独立完成并锁定，再显示 AI 辅助结果” | “所有 GxP 法规都要求人工必须先于 AI” | 这是默认流程的风险控制；可选非盲工作区不是独立首审，现行 Annex 11 不规定该特定先后顺序 |
 | AI 权限 | “AI/OCR 只辅助提取、对齐和异常说明，不覆盖人工、关闭偏差或放行” | “AI 替代复核”、“无人审核”、“自动放行” | 与项目 intended use 和权限边界相反 |
 | 精确判定 | “原始字符级完全一致由确定性规则引擎判定，LLM/VLM 不承担最终精确判定” | “用 LLM 保证参数 100% 相同” | 概率模型不适合承担该项目的字符级放行标准 |
 | 完全一致 | “`EXACT_MATCH` 表示两个非空原始字符串逐字符相同” | “`EXACT_MATCH` 表示参数合法/在限度内/可放行” | 字符相同不能证明值本身有效；例如两侧都是 `ERROR` |
@@ -43,11 +43,11 @@
 
 ### 中文
 
-> ParamGuard Vision（独立个人 PoC）—使用纯合成数据研究大批量图像参数核验。后端要求首审全部完成并锁定后才允许 AI/OCR，原始字符差异由确定性规则计算；带版本的流程档案将分歧、不确定和结构问题交给定向人工复核、条件性全字段盲二审或 QA。项目包含追加式审计原型和风险导向测试，不是企业委托成果或已验证的生产系统。
+> ParamGuard Vision（独立个人 PoC）—使用纯合成数据研究大批量图像参数核验。默认严格流程要求首审全部完成并锁定后才允许 AI/OCR，原始字符差异由确定性规则计算；带版本的流程档案将分歧、不确定和结构问题交给定向人工复核、条件性全字段盲二审或 QA。另有明确标注为非盲复核的本机图片工作区，不冒充独立首审。项目包含追加式审计原型和风险导向测试，不是企业委托成果或已验证的生产系统。
 
 ### English
 
-> **ParamGuard Vision** is an independent personal project for image-assisted parameter review, built exclusively with synthetic data. The backend requires a complete, locked first review before AI/OCR can run. Deterministic rules compare raw strings; versioned profiles route discrepancies and uncertainty to targeted human recheck, optional full-manifest blind second review, or QA. It includes an audit prototype and risk-focused tests, but is not a commissioned enterprise system or a validated GxP/21 CFR Part 11 production system.
+> **ParamGuard Vision** is an independent personal project for image-assisted parameter review, built exclusively with synthetic data. Its default strict workflow requires a complete, locked first review before AI/OCR can run. Deterministic rules compare raw strings; versioned profiles route discrepancies and uncertainty to targeted human recheck, optional full-manifest blind second review, or QA. A separate local image workspace supports explicitly non-blind review, not an independent first review. The project includes an audit prototype and risk-focused tests, but is not a commissioned enterprise system or a validated GxP/21 CFR Part 11 production system.
 
 只有当你已能亲自重建、运行测试并说明上述每项设计时，才应使用完整版表述；否则应删减为你真正掌握的部分。
 
@@ -58,3 +58,13 @@
 > 在纯合成、预先冻结的隐藏测试集 **[dataset name/version]** 上（`n=[sample count]`，其中差异样本 `[count]`），使用 **[software/model/rules version]** 和预先定义的 **[thresholds]**，差异召回率为 **[value, interval]**，假阴性率为 **[value, interval]**，拒答率为 **[value]**。结果仅适用于该合成数据分布，未证明真实工厂性能或 GxP 合规性。
 
 若缺任一字段，就不应发布简化的“准确率/提效率”声明。
+
+## 6. 辅助工作区的额外限制
+
+`ASSISTED_REVIEW_V1` 是与默认严格流程分开的本机图片工作区。它先运行 OCR 再收集人工记录，因此不能称为独立 R1，也不能满足“人员必须先于 AI 核验”的流程要求。原严格入口没有改变。
+
+界面上的“人工记录已完成”只说明所有目标字段已有填写记录；没有身份认证、电子签名或注意力检测，脚本也能模拟这些操作。自动化网页演示必须明确标为功能测试，不能据此证明真人认真看过、节省了多少人时或完成了授权审批。
+
+工作区只对 OCR 输出做确定性字符比较。行内词间空格是重建结果；编号 exact match 仍可能把误认的合法 ID 配错。当前只实测了有限的英文/数字单列合成布局，未证明任意照片、中文、多列、手写或所有 6000 项都能正确识别。
+
+公开的 6000→1000 结果是带完整分母的开发诊断，不是预先冻结的独立确认试验，没有推断性置信区间或工具优势结论。原文支持的差异数、未定位、不确定和错字应一起披露；不能只把 READY 或没有危险 SAME 写成“100% 核验成功”。

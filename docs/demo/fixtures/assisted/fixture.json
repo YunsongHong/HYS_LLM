@@ -1,0 +1,429 @@
+{
+  "synthetic": true,
+  "generator": "assisted-single-column-v1",
+  "source_rows_before_injected_cases_per_side": 48,
+  "selected_targets": 12,
+  "per_page": 100,
+  "images": {
+    "left": [
+      "left-001.png"
+    ],
+    "right": [
+      "right-001.png"
+    ]
+  },
+  "files": [
+    {
+      "path": "left-001.png",
+      "sha256": "c92a754979cd78da73fcf9d04e0845f2ecbc9327341f1e51862c378f3a060714",
+      "bytes": 129076,
+      "width": 900,
+      "height": 1831
+    },
+    {
+      "path": "right-001.png",
+      "sha256": "735aa96216419ea3a62af9670fa4770f561e210aa8ed7ed1720b5a363185d3b7",
+      "bytes": 126979,
+      "width": 900,
+      "height": 1761
+    }
+  ],
+  "truth_for_evaluation_only": [
+    {
+      "ordinal": 0,
+      "key": "P000001",
+      "left_count": 1,
+      "right_count": 1,
+      "left_value": "100.01 kPa",
+      "right_value": "100.01 kPa",
+      "locations": {
+        "left": [
+          {
+            "name": "left-001.png",
+            "row_box": [
+              32,
+              92,
+              890,
+              127
+            ]
+          }
+        ],
+        "right": [
+          {
+            "name": "right-001.png",
+            "row_box": [
+              32,
+              92,
+              890,
+              127
+            ]
+          }
+        ]
+      },
+      "expected": "SAME"
+    },
+    {
+      "ordinal": 1,
+      "key": "P000005",
+      "left_count": 1,
+      "right_count": 1,
+      "left_value": "100.05 kPa",
+      "right_value": "100.06 kPa",
+      "locations": {
+        "left": [
+          {
+            "name": "left-001.png",
+            "row_box": [
+              32,
+              232,
+              890,
+              267
+            ]
+          }
+        ],
+        "right": [
+          {
+            "name": "right-001.png",
+            "row_box": [
+              32,
+              232,
+              890,
+              267
+            ]
+          }
+        ]
+      },
+      "expected": "DIFFERENT"
+    },
+    {
+      "ordinal": 2,
+      "key": "P000009",
+      "left_count": 1,
+      "right_count": 0,
+      "left_value": "100.09 kPa",
+      "right_value": null,
+      "locations": {
+        "left": [
+          {
+            "name": "left-001.png",
+            "row_box": [
+              32,
+              372,
+              890,
+              407
+            ]
+          }
+        ],
+        "right": []
+      },
+      "expected": "NOT_LOCATED"
+    },
+    {
+      "ordinal": 3,
+      "key": "P000013",
+      "left_count": 2,
+      "right_count": 1,
+      "left_value": "100.13 kPa",
+      "right_value": "100.13 kPa",
+      "locations": {
+        "left": [
+          {
+            "name": "left-001.png",
+            "row_box": [
+              32,
+              512,
+              890,
+              547
+            ]
+          },
+          {
+            "name": "left-001.png",
+            "row_box": [
+              32,
+              547,
+              890,
+              582
+            ]
+          }
+        ],
+        "right": [
+          {
+            "name": "right-001.png",
+            "row_box": [
+              32,
+              477,
+              890,
+              512
+            ]
+          }
+        ]
+      },
+      "expected": "MULTIPLE_CANDIDATES"
+    },
+    {
+      "ordinal": 4,
+      "key": "P000017",
+      "left_count": 1,
+      "right_count": 1,
+      "left_value": "100.17 kPa",
+      "right_value": "100.17 kPa",
+      "locations": {
+        "left": [
+          {
+            "name": "left-001.png",
+            "row_box": [
+              32,
+              687,
+              890,
+              722
+            ]
+          }
+        ],
+        "right": [
+          {
+            "name": "right-001.png",
+            "row_box": [
+              32,
+              617,
+              890,
+              652
+            ]
+          }
+        ]
+      },
+      "expected": "SAME"
+    },
+    {
+      "ordinal": 5,
+      "key": "P000021",
+      "left_count": 1,
+      "right_count": 1,
+      "left_value": "100.21 kPa",
+      "right_value": "100.22 kPa",
+      "locations": {
+        "left": [
+          {
+            "name": "left-001.png",
+            "row_box": [
+              32,
+              827,
+              890,
+              862
+            ]
+          }
+        ],
+        "right": [
+          {
+            "name": "right-001.png",
+            "row_box": [
+              32,
+              757,
+              890,
+              792
+            ]
+          }
+        ]
+      },
+      "expected": "DIFFERENT"
+    },
+    {
+      "ordinal": 6,
+      "key": "P000025",
+      "left_count": 1,
+      "right_count": 1,
+      "left_value": "100.25 kPa",
+      "right_value": "100.25 kPa",
+      "locations": {
+        "left": [
+          {
+            "name": "left-001.png",
+            "row_box": [
+              32,
+              967,
+              890,
+              1002
+            ]
+          }
+        ],
+        "right": [
+          {
+            "name": "right-001.png",
+            "row_box": [
+              32,
+              897,
+              890,
+              932
+            ]
+          }
+        ]
+      },
+      "expected": "SAME"
+    },
+    {
+      "ordinal": 7,
+      "key": "P000029",
+      "left_count": 1,
+      "right_count": 1,
+      "left_value": "100.29 kPa",
+      "right_value": "100.29 kPa",
+      "locations": {
+        "left": [
+          {
+            "name": "left-001.png",
+            "row_box": [
+              32,
+              1107,
+              890,
+              1142
+            ]
+          }
+        ],
+        "right": [
+          {
+            "name": "right-001.png",
+            "row_box": [
+              32,
+              1037,
+              890,
+              1072
+            ]
+          }
+        ]
+      },
+      "expected": "SAME"
+    },
+    {
+      "ordinal": 8,
+      "key": "P000033",
+      "left_count": 1,
+      "right_count": 1,
+      "left_value": "100.33 kPa",
+      "right_value": "100.33 kPa",
+      "locations": {
+        "left": [
+          {
+            "name": "left-001.png",
+            "row_box": [
+              32,
+              1247,
+              890,
+              1282
+            ]
+          }
+        ],
+        "right": [
+          {
+            "name": "right-001.png",
+            "row_box": [
+              32,
+              1177,
+              890,
+              1212
+            ]
+          }
+        ]
+      },
+      "expected": "SAME"
+    },
+    {
+      "ordinal": 9,
+      "key": "P000037",
+      "left_count": 1,
+      "right_count": 1,
+      "left_value": "100.37 kPa",
+      "right_value": "100.38 kPa",
+      "locations": {
+        "left": [
+          {
+            "name": "left-001.png",
+            "row_box": [
+              32,
+              1387,
+              890,
+              1422
+            ]
+          }
+        ],
+        "right": [
+          {
+            "name": "right-001.png",
+            "row_box": [
+              32,
+              1317,
+              890,
+              1352
+            ]
+          }
+        ]
+      },
+      "expected": "DIFFERENT"
+    },
+    {
+      "ordinal": 10,
+      "key": "P000041",
+      "left_count": 1,
+      "right_count": 1,
+      "left_value": "100.41 kPa",
+      "right_value": "100.41 kPa",
+      "locations": {
+        "left": [
+          {
+            "name": "left-001.png",
+            "row_box": [
+              32,
+              1527,
+              890,
+              1562
+            ]
+          }
+        ],
+        "right": [
+          {
+            "name": "right-001.png",
+            "row_box": [
+              32,
+              1457,
+              890,
+              1492
+            ]
+          }
+        ]
+      },
+      "expected": "SAME"
+    },
+    {
+      "ordinal": 11,
+      "key": "P000045",
+      "left_count": 1,
+      "right_count": 1,
+      "left_value": "100.45 kPa",
+      "right_value": "100.45 kPa",
+      "locations": {
+        "left": [
+          {
+            "name": "left-001.png",
+            "row_box": [
+              32,
+              1667,
+              890,
+              1702
+            ]
+          }
+        ],
+        "right": [
+          {
+            "name": "right-001.png",
+            "row_box": [
+              32,
+              1597,
+              890,
+              1632
+            ]
+          }
+        ]
+      },
+      "expected": "SAME"
+    }
+  ],
+  "limitations": "Clean raster table, not a real photograph; truth is never passed to OCR."
+}

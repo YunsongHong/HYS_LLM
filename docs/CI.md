@@ -6,9 +6,10 @@
 
 1. 取出触发这次运行的精确代码 revision；
 2. 安装项目声明的 Python 依赖；
-3. 从已安装的 package 读取 `static/paramguard.html`，防止本地源码里有页面、但 wheel 漏打包静态资产；
-4. 用 `compileall` 检查全部源码和测试能否被 Python 解析；
-5. 运行 `tests/` 下的全部单元、对抗和集成测试。
+3. 从已安装的 package 读取 `static/paramguard.html` 和 `static/assisted.html`，防止本地源码里有页面、但 wheel 漏打包静态资产；
+4. 用 `compileall` 检查源码、测试和 Python 工具；
+5. 用 runner 的 Node 执行辅助工作区的异步 UI 回归；
+6. 运行 `tests/` 下的全部单元、对抗和集成测试。
 
 项目声明支持 Python 3.11 及以上，因此同时测试最低支持版本和当前开发版本，可以更早发现“只在我电脑上可用”的问题。
 
@@ -39,7 +40,11 @@ GitHub 托管 runner 上的测试成功不代表：
 - 项目已经获得 GxP、21 CFR Part 11、EU Annex 11 或企业验证；
 - 代码可以写入 MES/DCS/SCADA/PLC/LIMS 或自动放行。
 
-真实本地 OCR 集成测试在 runner 没有安装 Tesseract 时会明确 `skip`，不会伪装成已执行。完整的本机供应链检查仍要运行：
+真实本地 OCR 集成测试在 runner 没有安装 Tesseract 时会明确 `skip`，不会伪装成已执行。
+
+辅助工作区的 6000→1000 单元测试使用可控 TSV 桩验证全目标保留、记录完整性和重启，不等于真实 OCR 性能。`tools/benchmark_assisted.py` 才会逐张运行本机 Tesseract。Node VM 回归验证异步状态，不替代浏览器上传、框选和下载验收。
+
+完整的本机供应链检查仍要运行：
 
 ```bash
 PYTHONPATH=src python3 -m paramguard.supply_chain

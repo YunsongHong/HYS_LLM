@@ -79,6 +79,9 @@ class DocumentationContractTests(unittest.TestCase):
         "docs/PUBLISHING.md",
         "docs/LEARNING_00.md",
         "docs/LEARNING_ROADMAP.md",
+        "docs/ASSISTED_WORKBENCH.md",
+        "docs/ASSISTED_BENCHMARK.md",
+        "docs/demo/WALKTHROUGH.md",
     )
 
     def test_public_entry_structure_and_local_links(self) -> None:

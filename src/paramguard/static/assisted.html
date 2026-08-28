@@ -1,0 +1,2316 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="ParamGuard 本机图片参数辅助核验工作区。上传证据、指定编号、查看成对图块并逐项记录。"
+    />
+    <title>ParamGuard · 图片核验工作区</title>
+    <style nonce="__PG_NONCE__">
+      :root {
+        color-scheme: light;
+        --ink: #203332;
+        --muted: #647571;
+        --line: #d9e1db;
+        --bg: #f3f5f0;
+        --paper: #fff;
+        --accent: #176957;
+        --tint: #e7f1e9;
+        --amber: #8b4f13;
+        --danger: #a63e35;
+        --shadow: 0 6px 24px #26372b08;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          "PingFang SC",
+          sans-serif;
+        font-size: 14px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+      }
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+      }
+      button,
+      a,
+      input,
+      textarea,
+      select {
+        outline-offset: 4px;
+      }
+      button {
+        cursor: pointer;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: white;
+        padding: 9px 13px;
+        color: var(--ink);
+        font-weight: 600;
+      }
+      button:hover {
+        border-color: #789a8e;
+        background: #f3f7f3;
+      }
+      button:disabled {
+        opacity: 0.43;
+        cursor: not-allowed;
+      }
+      button.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: white;
+      }
+      button.primary:hover {
+        background: #105242;
+      }
+      button.plain {
+        border-color: transparent;
+        background: transparent;
+      }
+      button.danger {
+        color: var(--danger);
+      }
+      input,
+      textarea,
+      select {
+        border: 1px solid #cbd6cf;
+        border-radius: 6px;
+        background: white;
+        color: var(--ink);
+        padding: 9px 10px;
+        max-width: 100%;
+      }
+      input[type="checkbox"] {
+        accent-color: var(--accent);
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+      textarea {
+        resize: vertical;
+        line-height: 1.55;
+      }
+      a {
+        color: var(--accent);
+      }
+      [hidden] {
+        display: none !important;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+      h1 {
+        font-size: 26px;
+        letter-spacing: -0.7px;
+        line-height: 1.25;
+        margin-bottom: 10px;
+      }
+      h2 {
+        font-size: 18px;
+        letter-spacing: -0.25px;
+        margin-bottom: 15px;
+      }
+      h3 {
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .small {
+        font-size: 12px;
+        line-height: 1.65;
+      }
+      .mono,
+      code {
+        font-family: "SFMono-Regular", Consolas, monospace;
+      }
+      .mono {
+        font-variant-numeric: tabular-nums;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .between {
+        justify-content: space-between;
+      }
+      .wrap {
+        flex-wrap: wrap;
+      }
+      .grow {
+        flex: 1;
+        min-width: 0;
+      }
+      .stack > * + * {
+        margin-top: 14px;
+      }
+      .full {
+        width: 100%;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 5px;
+        padding: 4px 7px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        background: #edf1ee;
+        color: #53665f;
+        white-space: nowrap;
+      }
+      .pill.ok {
+        background: var(--tint);
+        color: var(--accent);
+      }
+      .pill.warn {
+        background: #fff1db;
+        color: var(--amber);
+      }
+      .pill.bad {
+        background: #fae8e3;
+        color: var(--danger);
+      }
+      .dot {
+        height: 6px;
+        width: 6px;
+        border-radius: 50%;
+        background: #4d876a;
+      }
+      .brandmark {
+        font-family: Georgia, serif;
+        font-weight: bold;
+        display: grid;
+        place-items: center;
+        background: var(--accent);
+        color: white;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        font-size: 20px;
+      }
+      .brand {
+        font-weight: 750;
+        font-size: 18px;
+        letter-spacing: -0.7px;
+      }
+      .topbar {
+        height: 70px;
+        border-bottom: 1px solid var(--line);
+        background: #fafbf8;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 30px;
+        gap: 18px;
+      }
+      .topbar .divider {
+        height: 22px;
+        width: 1px;
+        background: var(--line);
+        margin: 0 7px;
+      }
+      .mode-note {
+        background: #eaf0e8;
+        border-bottom: 1px solid var(--line);
+        padding: 10px 30px;
+        display: flex;
+        gap: 10px;
+        align-items: start;
+        font-size: 12px;
+        line-height: 1.6;
+        color: #44594d;
+      }
+      .mode-note strong {
+        white-space: nowrap;
+      }
+      .app {
+        max-width: 1536px;
+        margin: auto;
+        padding: 30px;
+      }
+      .eyebrow {
+        font-size: 11px;
+        letter-spacing: 1.6px;
+        font-weight: 650;
+        color: var(--accent);
+        margin-bottom: 12px;
+      }
+      .intro {
+        margin-bottom: 23px;
+      }
+      .intro p {
+        margin-bottom: 0;
+        color: var(--muted);
+        line-height: 1.7;
+        max-width: 750px;
+      }
+      .steps {
+        display: flex;
+        gap: 22px;
+        color: var(--muted);
+        font-size: 12px;
+        margin: 20px 0;
+      }
+      .steps b {
+        font-size: 10px;
+        margin-right: 6px;
+        background: #e0e9df;
+        border-radius: 50%;
+        width: 21px;
+        height: 21px;
+        display: inline-grid;
+        place-items: center;
+        color: #406753;
+      }
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: var(--paper);
+        box-shadow: var(--shadow);
+      }
+      .padded {
+        padding: 23px;
+      }
+      .setup-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.3fr) minmax(285px, 1fr);
+        gap: 20px;
+      }
+      .source-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      .source {
+        border: 1px dashed #b9c9be;
+        border-radius: 9px;
+        min-height: 204px;
+        padding: 17px;
+        background: #fafcf9;
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        transition: background 0.15s;
+      }
+      .source.drag {
+        background: #e2eee4;
+        border-color: var(--accent);
+      }
+      .source-tag {
+        width: 29px;
+        height: 29px;
+        display: grid;
+        place-items: center;
+        border: 1px solid #c5d4c8;
+        border-radius: 6px;
+        background: white;
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .source input {
+        font-size: 11px;
+        border: 0;
+        padding: 4px 0;
+        background: transparent;
+        width: 100%;
+      }
+      .source input::file-selector-button {
+        background: #fff;
+        border: 1px solid #c2d2c6;
+        padding: 7px 9px;
+        border-radius: 5px;
+        color: var(--accent);
+        cursor: pointer;
+      }
+      .files {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-size: 11px;
+        max-height: 145px;
+        overflow: auto;
+        color: var(--muted);
+      }
+      .files li {
+        margin: 7px 0;
+        overflow-wrap: anywhere;
+      }
+      .field-label {
+        display: block;
+        font-weight: 600;
+        font-size: 12px;
+        margin-bottom: 7px;
+      }
+      .targets {
+        height: 180px;
+        width: 100%;
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 13px;
+        background: #fafcf9;
+      }
+      .consents {
+        border-top: 1px solid var(--line);
+        margin-top: 18px;
+        padding-top: 17px;
+        display: grid;
+        gap: 9px;
+      }
+      .consents label {
+        display: flex;
+        align-items: start;
+        gap: 8px;
+        font-size: 12px;
+        line-height: 1.65;
+        cursor: pointer;
+      }
+      .consents input {
+        margin: 2px 0 0;
+      }
+      .setup-action {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-top: 20px;
+      }
+      .footnote {
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.7;
+        margin-top: 16px;
+        max-width: 940px;
+      }
+      .message {
+        border: 1px solid #d7c09a;
+        background: #fff7e9;
+        padding: 12px 15px;
+        border-radius: 8px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        color: #794916;
+      }
+      .message.error {
+        border-color: #dab3ad;
+        background: #fff0ed;
+        color: #8f332b;
+      }
+      .message.good {
+        border-color: #b8d2be;
+        background: #edf7ee;
+        color: #285b3e;
+      }
+      .history {
+        max-width: 240px;
+        font-size: 12px;
+      }
+      .job-header {
+        margin-bottom: 18px;
+      }
+      .job-header h1 {
+        font-size: 23px;
+        margin-bottom: 7px;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        background: var(--line);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 18px 0;
+      }
+      .stat {
+        background: #fbfcf9;
+        padding: 16px 18px;
+      }
+      .stat .number {
+        font-size: 25px;
+        letter-spacing: -0.8px;
+        font-weight: 650;
+        margin: 5px 0;
+      }
+      .stat .label {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .stat .number.attention {
+        color: var(--amber);
+      }
+      progress {
+        accent-color: var(--accent);
+        width: 100%;
+        height: 7px;
+        border: 0;
+      }
+      .working {
+        display: grid;
+        grid-template-columns: 255px minmax(0, 1fr);
+        gap: 18px;
+        align-items: start;
+      }
+      .queue {
+        overflow: hidden;
+        position: sticky;
+        top: 15px;
+      }
+      .queue-head {
+        padding: 17px 15px;
+        border-bottom: 1px solid var(--line);
+      }
+      .queue-head input,
+      .queue-head select {
+        width: 100%;
+        font-size: 12px;
+        margin-top: 10px;
+      }
+      .queue-list {
+        max-height: 590px;
+        overflow: auto;
+      }
+      .queue-item {
+        display: flex;
+        width: 100%;
+        text-align: left;
+        border: 0;
+        border-bottom: 1px solid #edf1ec;
+        border-radius: 0;
+        padding: 13px 14px;
+        gap: 10px;
+        align-items: start;
+        background: white;
+      }
+      .queue-item.active {
+        background: #eaf2e9;
+        box-shadow: inset 3px 0 var(--accent);
+      }
+      .queue-item .item-key {
+        font-size: 12px;
+        font-weight: 650;
+        display: block;
+        overflow-wrap: anywhere;
+      }
+      .queue-item .item-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 400;
+        color: var(--muted);
+        margin: 5px 0;
+      }
+      .checkmark {
+        width: 18px;
+        font-size: 13px;
+        color: #2e7759;
+        flex-shrink: 0;
+      }
+      .queue-footer {
+        border-top: 1px solid var(--line);
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 11px;
+      }
+      .queue-footer button {
+        padding: 5px 8px;
+      }
+      .detail {
+        min-width: 0;
+      }
+      .detail-head {
+        padding: 20px 22px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 12px;
+      }
+      .detail-head h2 {
+        font-size: 20px;
+        margin-bottom: 5px;
+        overflow-wrap: anywhere;
+      }
+      .evidence-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        padding: 20px 22px;
+      }
+      .evidence {
+        min-width: 0;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+        background: #fcfdfb;
+      }
+      .evidence-title {
+        padding: 12px 13px;
+        border-bottom: 1px solid var(--line);
+        font-size: 12px;
+        font-weight: 650;
+      }
+      .crop-area {
+        min-height: 115px;
+        background: #eef1e9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px;
+      }
+      .crop-area img {
+        max-width: 100%;
+        max-height: 230px;
+        object-fit: contain;
+        box-shadow: 0 1px 7px #0000000c;
+      }
+      .no-crop {
+        text-align: center;
+        font-size: 12px;
+        line-height: 1.8;
+        color: #7b8174;
+        padding: 20px 5px;
+      }
+      .evidence-body {
+        padding: 13px;
+      }
+      .value {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        font-size: 18px;
+        min-height: 42px;
+        line-height: 1.6;
+        background: #f2f5ef;
+        padding: 9px;
+        border-radius: 5px;
+        margin: 8px 0;
+      }
+      .value mark {
+        background: #ffe0b6;
+        color: #72410a;
+        border-radius: 2px;
+      }
+      .candidate-select {
+        width: 100%;
+        font-size: 11px;
+        margin: 9px 0;
+      }
+      .candidate-info {
+        font-size: 10px;
+        color: var(--muted);
+        line-height: 1.65;
+        overflow-wrap: anywhere;
+      }
+      .evidence-actions {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      .evidence-actions button {
+        font-size: 11px;
+        padding: 6px 8px;
+      }
+      .machine-note {
+        padding: 0 22px 18px;
+        font-size: 11px;
+        line-height: 1.7;
+        color: var(--muted);
+      }
+      .human-review {
+        padding: 21px 22px;
+        border-top: 1px solid var(--line);
+        background: #fafcf9;
+        border-radius: 0 0 11px 11px;
+      }
+      .human-review textarea {
+        width: 100%;
+        height: 66px;
+        font-size: 12px;
+      }
+      .verdicts {
+        display: flex;
+        gap: 9px;
+        flex-wrap: wrap;
+        margin-top: 13px;
+      }
+      .verdicts button {
+        flex: 1;
+        min-width: 98px;
+      }
+      .verdicts kbd {
+        font-size: 10px;
+        opacity: 0.65;
+        margin-left: 8px;
+        border: 1px solid currentColor;
+        border-radius: 3px;
+        padding: 1px 4px;
+      }
+      .save-note {
+        margin-top: 12px;
+        font-size: 11px;
+        line-height: 1.7;
+        color: var(--muted);
+      }
+      .work-toolbar {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+      .empty {
+        padding: 35px 22px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.9;
+      }
+      .loading-panel {
+        padding: 26px;
+      }
+      .loading-panel h2 {
+        margin-bottom: 8px;
+      }
+      .loading-panel progress {
+        margin: 15px 0;
+      }
+      .loading-panel .row {
+        margin-top: 12px;
+      }
+      .metadata {
+        margin-top: 13px;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.8;
+        overflow-wrap: anywhere;
+      }
+      dialog {
+        color: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        box-shadow: 0 16px 60px #17322233;
+        padding: 23px;
+        max-width: min(1100px, 94vw);
+        width: 94vw;
+        max-height: 92vh;
+        overflow: auto;
+      }
+      dialog::backdrop {
+        background: #17282088;
+      }
+      .dialog-header {
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 12px;
+      }
+      .dialog-header h2 {
+        margin-bottom: 6px;
+      }
+      .original-shell {
+        background: #edf0e8;
+        overflow: auto;
+        max-height: 55vh;
+        border: 1px solid var(--line);
+        margin-top: 12px;
+      }
+      .original-stage {
+        position: relative;
+        width: 100%;
+        line-height: 0;
+        user-select: none;
+        touch-action: none;
+      }
+      .original-stage img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .original-stage svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+      .original-stage rect {
+        stroke: #e59b1f;
+        fill: #ffbf3330;
+        stroke-width: 3;
+        vector-effect: non-scaling-stroke;
+      }
+      .coordinates {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+      }
+      .coordinates label {
+        font-size: 11px;
+        color: var(--muted);
+        max-width: 110px;
+      }
+      .coordinates input {
+        display: block;
+        width: 100%;
+        margin-top: 4px;
+      }
+      .dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 17px;
+      }
+      #finish-dialog {
+        max-width: 490px;
+        line-height: 1.8;
+      }
+      .local-footer {
+        margin-top: 25px;
+        font-size: 10px;
+        color: #7f8e82;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        line-height: 1.7;
+      }
+      .reading-hint {
+        border-left: 3px solid #bdcfc0;
+        padding-left: 12px;
+        font-size: 12px;
+        line-height: 1.75;
+        color: var(--muted);
+        margin-top: 17px;
+      }
+      @media (max-width: 1050px) {
+        .working {
+          grid-template-columns: 215px minmax(0, 1fr);
+        }
+        .evidence-grid {
+          padding: 15px;
+          gap: 10px;
+        }
+        .detail-head,
+        .human-review {
+          padding: 17px;
+        }
+        .setup-grid {
+          grid-template-columns: 1fr;
+        }
+        .topbar {
+          padding: 0 20px;
+        }
+        .app {
+          padding: 24px 20px;
+        }
+        .mode-note {
+          padding: 9px 20px;
+        }
+        .history {
+          max-width: 185px;
+        }
+        .topbar .caption {
+          display: none;
+        }
+      }
+      @media (max-width: 740px) {
+        .topbar {
+          height: 62px;
+          padding: 0 15px;
+        }
+        .topbar .divider,
+        .topbar .tagline {
+          display: none;
+        }
+        .brand {
+          font-size: 16px;
+        }
+        .topbar .row {
+          gap: 7px;
+        }
+        .app {
+          padding: 21px 14px;
+        }
+        .mode-note {
+          padding: 9px 15px;
+          font-size: 11px;
+        }
+        .history {
+          max-width: 125px;
+        }
+        .working {
+          grid-template-columns: 1fr;
+        }
+        .queue {
+          position: static;
+        }
+        .queue-list {
+          max-height: 210px;
+        }
+        .queue-head {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+        }
+        .queue-head h3 {
+          grid-column: 1/-1;
+          margin: 0;
+        }
+        .queue-head input,
+        .queue-head select {
+          margin: 0;
+        }
+        .evidence-grid {
+          gap: 8px;
+          padding: 12px;
+        }
+        .evidence-body {
+          padding: 10px;
+        }
+        .crop-area {
+          padding: 7px;
+          min-height: 90px;
+        }
+        .value {
+          font-size: 15px;
+        }
+        .stats .stat {
+          padding: 12px 10px;
+        }
+        .stat .number {
+          font-size: 22px;
+        }
+        .job-header {
+          align-items: start;
+        }
+        .work-toolbar {
+          flex-wrap: wrap;
+        }
+        .work-toolbar button {
+          font-size: 11px;
+          padding: 7px;
+        }
+        .padded {
+          padding: 18px;
+        }
+        .setup-action {
+          align-items: start;
+        }
+        .steps {
+          gap: 13px;
+          font-size: 11px;
+        }
+        .source {
+          padding: 12px;
+          min-height: 196px;
+        }
+        .source-grid {
+          gap: 10px;
+        }
+        .source h3 {
+          font-size: 13px;
+        }
+        .source .small {
+          font-size: 11px;
+        }
+        .intro h1 {
+          font-size: 24px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          scroll-behavior: auto !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="row">
+        <span class="brandmark" aria-hidden="true">P</span
+        ><span class="brand">ParamGuard</span><span class="divider"></span
+        ><span class="muted small tagline">图片核验工作区</span>
+      </div>
+      <div class="row">
+        <span class="pill ok caption"
+          ><span class="dot"></span>仅在本机处理</span
+        ><select id="history" class="history" aria-label="打开本地历史任务">
+          <option value="">本地任务</option></select
+        ><button id="new-job" class="plain">＋ 新建</button>
+      </div>
+    </header>
+    <div class="mode-note">
+      <strong>辅助核验模式</strong
+      ><span
+        >先看 OCR
+        提示，再逐项人工复核；不属于独立人工首审，不会自动批准或放行。</span
+      >
+    </div>
+    <main class="app">
+      <div
+        id="message"
+        class="message"
+        role="status"
+        aria-live="polite"
+        hidden
+      ></div>
+      <section id="setup">
+        <div class="intro">
+          <div class="eyebrow">NEW REVIEW / 新建核验</div>
+          <h1>把要核对的参数，放到一起。</h1>
+          <p>
+            上传照片与截图，指定需要核验的编号。系统寻找两边的候选位置，保留每个目标，再由你看图判断。
+          </p>
+        </div>
+        <div class="steps">
+          <span><b>1</b>导入两边图片</span><span><b>2</b>指定参数清单</span
+          ><span><b>3</b>逐项看图复核</span>
+        </div>
+        <div class="setup-grid">
+          <section class="panel padded">
+            <div class="row between">
+              <h2>两份原始证据</h2>
+              <span class="pill">PNG / JPEG</span>
+            </div>
+            <div class="source-grid">
+              <div class="source" id="left-drop">
+                <span class="source-tag">A</span>
+                <h3>照片 A</h3>
+                <div class="muted small">
+                  拖入图片，或选择文件。<br />可分成多张清晰、连续的页面。
+                </div>
+                <input
+                  id="left-files"
+                  type="file"
+                  accept="image/png,image/jpeg"
+                  multiple
+                  aria-label="上传照片 A"
+                />
+                <ul class="files" id="left-list"></ul>
+              </div>
+              <div class="source" id="right-drop">
+                <span class="source-tag">A′</span>
+                <h3>截图 A′</h3>
+                <div class="muted small">
+                  另一份待比较的来源。<br />按编号配对，不依赖上传顺序。
+                </div>
+                <input
+                  id="right-files"
+                  type="file"
+                  accept="image/png,image/jpeg"
+                  multiple
+                  aria-label="上传截图 A′"
+                />
+                <ul class="files" id="right-list"></ul>
+              </div>
+            </div>
+            <p class="reading-hint">
+              首版支持<strong>一行一个连续编号，后面跟数值和单位</strong>的单列表格。复杂多列、断行编号和模糊图像需要人工补定位；不能保证自动找齐。
+            </p>
+            <p class="small muted">
+              单张 ≤8 MiB、≤1600
+              万像素；每侧最多64张。过长截图请分图，保留完整编号和参数行。
+            </p>
+          </section>
+          <section class="panel padded">
+            <h2>这次要核验哪些参数？</h2>
+            <label class="field-label" for="job-label">任务名称</label
+            ><input
+              id="job-label"
+              class="full"
+              maxlength="120"
+              placeholder="例如：控制参数对照 · 第一批"
+            />
+            <div class="row between">
+              <label class="field-label" for="targets">目标编号清单</label
+              ><label class="small" for="target-file">导入 .txt / .csv</label>
+            </div>
+            <input
+              id="target-file"
+              type="file"
+              accept=".txt,.csv,text/plain,text/csv"
+              aria-label="导入目标编号文件"
+              class="small full"
+            />
+            <textarea
+              id="targets"
+              class="targets"
+              spellcheck="false"
+              aria-label="目标编号清单"
+              placeholder="P000001&#10;P000006&#10;P000012"
+            ></textarea>
+            <p class="small muted">
+              一行一个编号；或 CSV 两列
+              <code>parameter_id,label</code
+              >。保留大小写与前导零，重复编号会被拒绝。每任务最多2000项。
+            </p>
+            <div class="consents">
+              <label
+                ><input id="consent-mode" type="checkbox" /><span
+                  >我选择先显示机器提示的辅助核验，不把它当成独立首审。</span
+                ></label
+              >
+              <label
+                ><input id="consent-data" type="checkbox" /><span
+                  >这是我有权使用的合成测试图片，不含公司、患者、凭据或个人敏感信息。</span
+                ></label
+              >
+              <label
+                ><input id="consent-layout" type="checkbox" /><span
+                  >图片使用单列逐行布局，编号是连续的英文或数字标识。</span
+                ></label
+              >
+            </div>
+          </section>
+        </div>
+        <div class="setup-action">
+          <span id="setup-status" class="small muted"
+            >图片和核验记录保存在这台电脑，不发送给云端模型。</span
+          ><button id="create-job" class="primary">创建并定位参数 →</button>
+        </div>
+        <div id="draft-actions" class="row wrap" hidden>
+          <button id="upload-more">上传本次选择的图片</button
+          ><button id="start-draft" class="primary">
+            冻结图片与清单，开始定位</button
+          ><span class="small muted"
+            >已保存的图片会保留；开始后不能替换来源。</span
+          >
+        </div>
+        <p class="footnote">
+          机器只比较识别出的文字，不替你确认原图是否正确。即使结果提示相同，仍需逐项检查编号、数值、单位和图中空格。原来的
+          STRICT_SEQUENTIAL 人工首审程序不受此工作区影响。
+        </p>
+      </section>
+      <section id="workspace" hidden>
+        <div class="job-header row between wrap">
+          <div>
+            <div class="eyebrow">REVIEW WORKSPACE / 核验工作区</div>
+            <h1 id="active-label"></h1>
+            <span id="job-state" class="pill"></span>
+          </div>
+          <div class="work-toolbar">
+            <button id="refresh">刷新记录</button
+            ><button id="export">导出记录</button
+            ><button id="finish" class="primary" disabled>完成人工记录</button>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <div class="label">本次目标</div>
+            <div class="number mono" id="total">0</div>
+            <div class="small muted">不代表全部来源参数</div>
+          </div>
+          <div class="stat">
+            <div class="label">人工已复核</div>
+            <div class="number mono" id="reviewed">0</div>
+            <progress
+              id="human-progress"
+              value="0"
+              max="1"
+              aria-label="人工复核进度"
+            ></progress>
+          </div>
+          <div class="stat">
+            <div class="label">机器提示差异</div>
+            <div class="number mono attention" id="different">0</div>
+            <div class="small muted">原始提示不会被删除</div>
+          </div>
+          <div class="stat">
+            <div class="label">定位 / 识别待确认</div>
+            <div class="number mono attention" id="unresolved">0</div>
+            <div class="small muted">未找到、重复或不确定</div>
+          </div>
+        </div>
+        <div id="run-progress" class="panel loading-panel" hidden>
+          <h2 id="run-title">正在逐图寻找参数</h2>
+          <div id="run-description" class="small muted"></div>
+          <progress
+            id="ocr-progress"
+            value="0"
+            max="1"
+            aria-label="图片处理进度"
+          ></progress>
+          <div class="row between">
+            <span id="run-count" class="small mono"></span
+            ><button id="cancel" class="danger">停止本次识别</button>
+          </div>
+        </div>
+        <div id="review-surface" class="working" hidden>
+          <aside class="panel queue">
+            <div class="queue-head">
+              <h3>
+                目标清单 <span id="queue-count" class="muted small"></span>
+              </h3>
+              <input
+                id="search"
+                type="search"
+                maxlength="128"
+                placeholder="搜索编号或名称"
+                aria-label="搜索目标"
+              /><select id="filter" aria-label="筛选核验项">
+                <option value="all">全部目标</option>
+                <option value="pending">尚未人工复核</option>
+                <option value="DIFFERENT">机器提示差异</option>
+                <option value="NOT_LOCATED">未定位</option>
+                <option value="MULTIPLE_CANDIDATES">多个候选</option>
+                <option value="UNCERTAIN">识别不确定</option>
+                <option value="SAME">机器提示相同</option>
+              </select>
+            </div>
+            <div id="queue" class="queue-list"></div>
+            <div class="queue-footer">
+              <button id="previous-page" aria-label="上一页">←</button
+              ><span id="pagination"></span
+              ><button id="next-page" aria-label="下一页">→</button>
+            </div>
+          </aside>
+          <div class="detail">
+            <article class="panel" id="item-detail">
+              <div class="empty">从左侧选择一个目标。</div>
+            </article>
+            <div class="metadata" id="evidence-binding"></div>
+          </div>
+        </div>
+      </section>
+      <footer class="local-footer">
+        <span>PARAMGUARD VISION · LOCAL PROTOTYPE</span
+        ><span>仅限合成测试 · 无自动批准 · 无生产验证</span>
+      </footer>
+    </main>
+    <dialog id="image-dialog">
+      <div class="dialog-header">
+        <div>
+          <h2 id="image-title">原图与手动定位</h2>
+          <p id="image-help" class="small muted"></p>
+        </div>
+        <button id="close-image" aria-label="关闭原图">✕</button>
+      </div>
+      <div id="image-message" class="message error" role="status" hidden></div>
+      <div class="row wrap">
+        <label for="image-page" class="small">选择该侧原图</label
+        ><select id="image-page" class="grow"></select
+        ><button id="zoom-out" aria-label="缩小原图">−</button
+        ><span id="zoom-label" class="small">100%</span
+        ><button id="zoom-in" aria-label="放大原图">＋</button>
+      </div>
+      <div class="original-shell">
+        <div class="original-stage" id="original-stage">
+          <img
+            id="original-image"
+            alt="本任务上传的原始证据，经方向校正显示"
+            draggable="false"
+          /><svg id="region-overlay" aria-hidden="true">
+            <rect id="region-rectangle" x="0" y="0" width="0" height="0"></rect>
+          </svg>
+        </div>
+      </div>
+      <div id="region-controls">
+        <div class="coordinates">
+          <label>左 X<input id="box-x1" type="number" min="0" step="1" /></label
+          ><label
+            >上 Y<input id="box-y1" type="number" min="0" step="1" /></label
+          ><label
+            >右 X<input id="box-x2" type="number" min="1" step="1" /></label
+          ><label
+            >下 Y<input id="box-y2" type="number" min="1" step="1"
+          /></label>
+        </div>
+        <p class="small muted">
+          只框选当前编号对应的<strong>值与单位</strong>。请先在原图确认编号；手动重定位后，该项旧人工记录留在历史中，当前项须重新复核。
+        </p>
+      </div>
+      <div class="dialog-actions">
+        <button id="cancel-image">返回核验</button
+        ><button id="save-region" class="primary">采用区域并重新识别</button>
+      </div>
+    </dialog>
+    <dialog id="finish-dialog">
+      <h2>保存完整的人工核验记录？</h2>
+      <p>
+        所有目标都已有人工结论。这个操作会将本任务设为只读，机器差异和“无法判断”仍保留。
+      </p>
+      <p class="small muted">
+        这不是批准、异常关闭或生产放行。请先导出检查，后续修订需要新建任务。
+      </p>
+      <div class="dialog-actions">
+        <button id="cancel-finish">继续检查</button
+        ><button id="confirm-finish" class="primary">确认完成记录</button>
+      </div>
+    </dialog>
+    <script nonce="__PG_NONCE__">
+      "use strict";
+      const $ = (id) => document.getElementById(id);
+      const csrf = "__PG_CSRF__";
+      const statusText = {
+        PENDING: "尚未识别",
+        SAME: "机器提示相同",
+        DIFFERENT: "机器提示差异",
+        UNCERTAIN: "识别不确定",
+        NOT_LOCATED: "未定位",
+        MULTIPLE_CANDIDATES: "多个候选",
+      };
+      const humanText = { SAME: "相同", DIFFERENT: "不同", UNABLE: "无法判断" };
+      const stageText = {
+        DRAFT: "图片导入中",
+        INDEXING: "机器定位中",
+        READY: "等待人工逐项复核",
+        REVIEW_COMPLETE: "人工记录已完成 · 未批准",
+        FAILED: "识别失败 · 未接纳部分结果",
+        INTERRUPTED: "上次识别中断",
+        CANCELLED: "识别已停止",
+      };
+      const problemText = {
+        NO_VALUE: "未识别到值",
+        AMBIGUOUS_LAYOUT: "可能串列或含另一编号",
+        LOW_CONFIDENCE: "存在低置信文字",
+        MULTILINE_REGION: "区域包含多行",
+      };
+      let job = null,
+        selected = null,
+        detail = null,
+        offset = 0,
+        busy = false,
+        poll = null,
+        searchTimer = null,
+        draw = null,
+        modal = null,
+        zoom = 100,
+        loadingSequence = 0,
+        itemRequest = 0,
+        loadingView = false;
+      const files = { left: [], right: [] };
+      function node(tag, text, classes) {
+        const n = document.createElement(tag);
+        if (text !== undefined) n.textContent = text;
+        if (classes) n.className = classes;
+        return n;
+      }
+      function showMessage(text, type = "") {
+        const m = $("message");
+        m.textContent = text;
+        m.className = "message " + type;
+        m.hidden = !text;
+      }
+      function setBusy(value) {
+        busy = value;
+        const waiting = value || loadingView;
+        document
+          .querySelectorAll("[data-mutate]")
+          .forEach(
+            (b) => (b.disabled = waiting || (job && job.state !== "READY")),
+          );
+        for (const id of [
+          "create-job",
+          "upload-more",
+          "start-draft",
+          "left-files",
+          "right-files",
+          "search",
+          "filter",
+          "refresh",
+          "export",
+          "cancel",
+        ])
+          $(id).disabled = waiting;
+        for (const id of ["history", "new-job"]) $(id).disabled = value;
+        $("target-file").disabled = waiting || job?.state === "DRAFT";
+        $("previous-page").disabled = waiting || offset === 0;
+        $("next-page").disabled =
+          waiting || !job || offset + 25 >= job.filtered_total;
+        $("finish").disabled = waiting || !job?.can_finish;
+      }
+      async function api(path, body) {
+        const options = { cache: "no-store", headers: {} };
+        if (body !== undefined) {
+          options.method = "POST";
+          options.headers = {
+            "Content-Type": "application/json",
+            "X-ParamGuard-CSRF": csrf,
+          };
+          options.body = JSON.stringify(body);
+        }
+        let response;
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            response = await fetch(path, options);
+            break;
+          } catch (e) {
+            if (attempt)
+              throw new Error(
+                "本机连接中断。请刷新查看已保存记录，不要重复创建任务。",
+              );
+          }
+        }
+        const result = await response.json();
+        if (!response.ok) {
+          const e = new Error(result.message || "操作未成功");
+          e.code = result.error;
+          throw e;
+        }
+        return result;
+      }
+      function binding(extra = {}) {
+        return {
+          expected_revision: job.revision,
+          manifest_hash: job.manifest_hash,
+          command_id: crypto.randomUUID(),
+          ...extra,
+        };
+      }
+      async function mutate(action, extra = {}) {
+        if (loadingView || !job)
+          throw new Error("正在切换任务，请等页面加载完成再操作。");
+        const isItem = ["review", "choose", "region"].includes(action),
+          source = isItem ? detail : job;
+        if (
+          isItem &&
+          (!source ||
+            source.job !== job.job_id ||
+            source.ordinal !== selected ||
+            extra.ordinal !== source.ordinal)
+        )
+          throw new Error("正在切换核验项，请等图块加载完成再操作。");
+        const id = isItem ? source.job : source.job_id;
+        const payload = {
+          expected_revision: source.revision,
+          manifest_hash: source.manifest_hash,
+          command_id: crypto.randomUUID(),
+          ...extra,
+        };
+        const result = await api("/api/jobs/" + id + "/" + action, payload);
+        if (job?.job_id === id) {
+          job.revision = result.revision;
+          job.manifest_hash = result.manifest_hash;
+        }
+        return result;
+      }
+      async function guarded(fn) {
+        if (busy || loadingView) return;
+        setBusy(true);
+        showMessage("");
+        try {
+          await fn();
+        } catch (e) {
+          showMessage(e.message, "error");
+          if (e.code === "STALE_REVISION" && job)
+            await loadJob(job.job_id).catch(() => {});
+        } finally {
+          setBusy(false);
+        }
+      }
+      async function histories() {
+        const result = await api("/api/jobs");
+        const select = $("history");
+        select.replaceChildren(new Option("本地任务", ""));
+        for (const j of result.jobs)
+          select.add(
+            new Option(j.label + " · " + (stageText[j.state] || j.state), j.id),
+          );
+        select.value = job?.job_id || "";
+      }
+      function renderFiles(side) {
+        const list = $(side + "-list");
+        list.replaceChildren();
+        const saved =
+          job?.state === "DRAFT"
+            ? job.pages.filter((p) => p.side === side)
+            : [];
+        for (const p of saved) list.append(node("li", "✓ 已保存 " + p.name));
+        for (const f of files[side])
+          list.append(
+            node("li", f.name + " · " + (f.size / 1024).toFixed(0) + " KB"),
+          );
+      }
+      function selectFiles(side, list) {
+        if (busy || loadingView) return;
+        const incoming = Array.from(list);
+        if (incoming.some((f) => f.size > 8 * 1024 * 1024)) {
+          showMessage("有图片超过8 MiB，请分图后再上传。", "error");
+          return;
+        }
+        if (incoming.length > 64) {
+          showMessage("每侧最多64张图片。", "error");
+          return;
+        }
+        files[side] = incoming;
+        renderFiles(side);
+      }
+      for (const side of ["left", "right"]) {
+        $(side + "-files").addEventListener("change", (e) =>
+          selectFiles(side, e.target.files),
+        );
+        const drop = $(side + "-drop");
+        drop.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          drop.classList.add("drag");
+        });
+        drop.addEventListener("dragleave", () => drop.classList.remove("drag"));
+        drop.addEventListener("drop", (e) => {
+          e.preventDefault();
+          drop.classList.remove("drag");
+          selectFiles(side, e.dataTransfer.files);
+        });
+      }
+      function fileBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onerror = () => reject(new Error("未能读取所选文件"));
+          reader.onload = () => resolve(String(reader.result).split(",")[1]);
+          reader.readAsDataURL(file);
+        });
+      }
+      $("target-file").addEventListener("change", async (e) => {
+        const f = e.target.files[0],
+          generation = loadingSequence;
+        if (!f || busy || job?.state === "DRAFT") return;
+        if (f.size > 400000) {
+          showMessage("目标清单文件过大。", "error");
+          return;
+        }
+        try {
+          const content = new TextDecoder("utf-8", { fatal: true }).decode(
+            await f.arrayBuffer(),
+          );
+          if (generation === loadingSequence && !busy && job?.state !== "DRAFT")
+            $("targets").value = content;
+        } catch {
+          if (generation === loadingSequence) {
+            $("targets").value = "";
+            showMessage("清单须为UTF-8编码的 .txt 或 .csv 文件。", "error");
+          }
+        }
+      });
+      function resetSetup() {
+        clearTimeout(poll);
+        clearTimeout(searchTimer);
+        loadingSequence++;
+        itemRequest++;
+        loadingView = false;
+        job = null;
+        detail = null;
+        selected = null;
+        offset = 0;
+        location.hash = "";
+        $("setup").hidden = false;
+        $("workspace").hidden = true;
+        $("draft-actions").hidden = true;
+        $("create-job").hidden = false;
+        $("history").value = "";
+        for (const id of ["job-label", "targets"]) $(id).disabled = false;
+        for (const side of ["left", "right"]) {
+          files[side] = [];
+          $(side + "-files").value = "";
+          renderFiles(side);
+        }
+        setBusy(false);
+        showMessage("");
+      }
+      $("new-job").addEventListener("click", () => {
+        if (busy) return;
+        resetSetup();
+      });
+      $("history").addEventListener("change", () => {
+        if ($("history").value && !busy)
+          loadJob($("history").value).catch((e) =>
+            showMessage(e.message, "error"),
+          );
+      });
+      async function uploadFiles() {
+        for (const side of ["left", "right"]) {
+          const queue = [...files[side]];
+          for (const f of queue) {
+            $("setup-status").textContent = "正在保存 " + f.name + "…";
+            await mutate("images", {
+              side,
+              name: f.name,
+              data: await fileBase64(f),
+            });
+            files[side] = files[side].filter((file) => file !== f);
+            job = await api("/api/jobs/" + job.job_id);
+            renderFiles(side);
+          }
+          $(side + "-files").value = "";
+        }
+        $("setup-status").textContent =
+          "所选图片已保存在本机，请确认两边均已上传。";
+      }
+      $("create-job").addEventListener("click", () =>
+        guarded(async () => {
+          if (!files.left.length || !files.right.length)
+            throw new Error("请先选择照片 A 和截图 A′。");
+          const result = await api("/api/jobs", {
+            label: $("job-label").value,
+            targets: $("targets").value,
+            acknowledge_assisted: $("consent-mode").checked,
+            confirm_local_test_data: $("consent-data").checked,
+            confirm_single_column: $("consent-layout").checked,
+            command_id: crypto.randomUUID(),
+          });
+          job = await api("/api/jobs/" + result.job_id);
+          location.hash = job.job_id;
+          $("create-job").hidden = true;
+          $("draft-actions").hidden = false;
+          $("targets").disabled = true;
+          $("job-label").disabled = true;
+          await histories();
+          await uploadFiles();
+          await mutate("start");
+          await loadJob(job.job_id);
+        }),
+      );
+      $("upload-more").addEventListener("click", () => guarded(uploadFiles));
+      $("start-draft").addEventListener("click", () =>
+        guarded(async () => {
+          await mutate("start");
+          await loadJob(job.job_id);
+        }),
+      );
+      async function loadJob(id) {
+        clearTimeout(poll);
+        const sequence = ++loadingSequence;
+        itemRequest++;
+        detail = null;
+        loadingView = true;
+        $("item-detail").replaceChildren(
+          node("div", "正在载入核验项…", "empty"),
+        );
+        setBusy(busy);
+        if (job?.job_id !== id) {
+          offset = 0;
+          selected = null;
+          for (const side of ["left", "right"]) {
+            files[side] = [];
+            $(side + "-files").value = "";
+          }
+        }
+        const params = new URLSearchParams({
+          offset: String(offset),
+          limit: "25",
+          filter: $("filter").value,
+          query: $("search").value,
+        });
+        let result;
+        try {
+          result = await api("/api/jobs/" + id + "?" + params);
+        } catch (e) {
+          if (sequence === loadingSequence) {
+            loadingView = false;
+            setBusy(busy);
+          }
+          throw e;
+        }
+        if (sequence !== loadingSequence) return;
+        job = result;
+        loadingView = false;
+        setBusy(busy);
+        location.hash = id;
+        $("history").value = id;
+        for (const option of $("history").options)
+          if (option.value === id)
+            option.textContent =
+              job.label + " · " + (stageText[job.state] || job.state);
+        if (job.state === "DRAFT") {
+          $("workspace").hidden = true;
+          $("setup").hidden = false;
+          $("create-job").hidden = true;
+          $("draft-actions").hidden = false;
+          $("job-label").value = job.label;
+          $("job-label").disabled = true;
+          $("targets").value =
+            "已冻结 " + job.total + " 个目标；开始后在清单中查看。";
+          $("targets").disabled = true;
+          renderFiles("left");
+          renderFiles("right");
+          setBusy(busy);
+          return;
+        }
+        $("setup").hidden = true;
+        $("workspace").hidden = false;
+        $("active-label").textContent = job.label;
+        $("job-state").textContent = stageText[job.state] || job.state;
+        $("total").textContent = job.total.toLocaleString();
+        $("reviewed").textContent = job.reviewed.toLocaleString();
+        $("human-progress").max = job.total;
+        $("human-progress").value = job.reviewed;
+        $("different").textContent = job.counts.DIFFERENT;
+        $("unresolved").textContent =
+          job.counts.NOT_LOCATED +
+          job.counts.MULTIPLE_CANDIDATES +
+          job.counts.UNCERTAIN;
+        $("finish").disabled = !job.can_finish || busy;
+        const ready = ["READY", "REVIEW_COMPLETE"].includes(job.state);
+        $("review-surface").hidden = !ready;
+        $("run-progress").hidden = ready;
+        if (!ready) {
+          $("run-title").textContent =
+            job.state === "INDEXING"
+              ? "正在逐图寻找参数"
+              : stageText[job.state];
+          $("run-description").textContent =
+            job.error ||
+            "完成全部图片后才发布候选。识别到的文本行数不等于正确匹配的参数数。";
+          $("ocr-progress").max = job.pages.length || 1;
+          $("ocr-progress").value = job.progress;
+          $("run-count").textContent =
+            job.progress +
+            " / " +
+            job.pages.length +
+            " 张已处理 · " +
+            job.indexed_lines +
+            " 行识别输出";
+          $("cancel").hidden = job.state !== "INDEXING";
+          if (job.state === "INDEXING")
+            poll = setTimeout(
+              () => loadJob(id).catch((e) => showMessage(e.message, "error")),
+              1400,
+            );
+          return;
+        }
+        renderQueue();
+        if (selected === null || !job.items.some((i) => i.ordinal === selected))
+          selected = job.items[0]?.ordinal ?? null;
+        if (selected !== null) await selectItem(selected);
+        else {
+          $("item-detail").replaceChildren(
+            node(
+              "div",
+              "没有符合筛选的目标。未匹配项仍保留在「全部目标」中。",
+              "empty",
+            ),
+          );
+          detail = null;
+        }
+      }
+      function badge(status) {
+        return node(
+          "span",
+          statusText[status] || status,
+          "pill " +
+            (status === "SAME"
+              ? "ok"
+              : status === "DIFFERENT"
+                ? "bad"
+                : status === "PENDING"
+                  ? ""
+                  : "warn"),
+        );
+      }
+      function renderQueue() {
+        const q = $("queue");
+        q.replaceChildren();
+        for (const item of job.items) {
+          const b = node(
+            "button",
+            undefined,
+            "queue-item" + (selected === item.ordinal ? " active" : ""),
+          );
+          b.type = "button";
+          b.setAttribute(
+            "aria-label",
+            item.key +
+              "，" +
+              (item.human ? "人工" + humanText[item.human] : "待人工复核"),
+          );
+          b.dataset.ordinal = item.ordinal;
+          b.append(node("span", item.human ? "✓" : "○", "checkmark"));
+          const labels = node("span", undefined, "grow");
+          labels.append(
+            node("span", item.key, "item-key"),
+            node(
+              "span",
+              item.label === item.key
+                ? "第 " + (item.ordinal + 1) + " 项"
+                : item.label,
+              "item-label",
+            ),
+            badge(item.status),
+          );
+          b.append(labels);
+          b.addEventListener("click", () => {
+            if (!busy)
+              selectItem(item.ordinal).catch((e) =>
+                showMessage(e.message, "error"),
+              );
+          });
+          q.append(b);
+        }
+        $("queue-count").textContent = job.filtered_total + " 项";
+        $("pagination").textContent =
+          (job.filtered_total ? offset + 1 : 0) +
+          "–" +
+          Math.min(offset + 25, job.filtered_total) +
+          " / " +
+          job.filtered_total;
+        $("previous-page").disabled = offset === 0;
+        $("next-page").disabled = offset + 25 >= job.filtered_total;
+      }
+      function differenceRange(a, b) {
+        let prefix = 0;
+        while (prefix < Math.min(a.length, b.length) && a[prefix] === b[prefix])
+          prefix++;
+        let suffix = 0;
+        while (
+          suffix < a.length - prefix &&
+          suffix < b.length - prefix &&
+          a[a.length - 1 - suffix] === b[b.length - 1 - suffix]
+        )
+          suffix++;
+        return [prefix, a.length - suffix];
+      }
+      function rawValue(value, other) {
+        const pre = node("div", undefined, "value mono");
+        if (other !== null && value !== other) {
+          const [a, b] = differenceRange(value, other);
+          pre.append(
+            document.createTextNode(value.slice(0, a)),
+            node("mark", value.slice(a, b)),
+            document.createTextNode(value.slice(b)),
+          );
+        } else pre.textContent = value || "（未读出值）";
+        return pre;
+      }
+      async function selectItem(ordinal) {
+        const id = job.job_id,
+          generation = loadingSequence,
+          request = ++itemRequest;
+        selected = ordinal;
+        detail = null;
+        loadingView = true;
+        setBusy(busy);
+        let result;
+        try {
+          result = await api("/api/jobs/" + id + "/items/" + ordinal);
+        } catch (e) {
+          if (generation === loadingSequence && request === itemRequest) {
+            loadingView = false;
+            setBusy(busy);
+          }
+          throw e;
+        }
+        if (
+          !job ||
+          job.job_id !== id ||
+          selected !== ordinal ||
+          generation !== loadingSequence ||
+          request !== itemRequest
+        )
+          return;
+        detail = result;
+        loadingView = false;
+        job.revision = result.revision;
+        job.manifest_hash = result.manifest_hash;
+        renderQueue();
+        const root = $("item-detail");
+        root.replaceChildren();
+        const head = node("div", undefined, "detail-head"),
+          title = node("div");
+        title.append(
+          node("h2", detail.key, "mono"),
+          node(
+            "span",
+            detail.label === detail.key
+              ? "核对两侧编号、数值与单位"
+              : detail.label,
+            "small muted",
+          ),
+        );
+        head.append(title, badge(detail.status));
+        root.append(head);
+        const pair = node("div", undefined, "evidence-grid");
+        for (const side of ["left", "right"]) pair.append(evidenceCard(side));
+        root.append(
+          pair,
+          node(
+            "div",
+            "高亮来自识别文字的确定性比较，不是对原图正确性的保证。OCR 词间空格为重建结果；请同时看图。编号误认成另一个合法编号仍可能造成错配。",
+            "machine-note",
+          ),
+        );
+        const human = node("section", undefined, "human-review");
+        human.append(node("h3", "你的人工复核"));
+        const reasonLabel = node(
+          "label",
+          "复核备注（不同、无法判断或推翻机器提示时必填）",
+          "field-label",
+        );
+        reasonLabel.htmlFor = "review-reason";
+        const reason = node("textarea");
+        reason.id = "review-reason";
+        reason.maxLength = 500;
+        reason.placeholder = "写下你从原图看到的依据…";
+        reason.value = detail.reason;
+        reason.disabled = job.state !== "READY";
+        human.append(reasonLabel, reason);
+        const buttons = node("div", undefined, "verdicts");
+        for (const [verdict, key] of [
+          ["SAME", "S"],
+          ["DIFFERENT", "D"],
+          ["UNABLE", "U"],
+        ]) {
+          const button = node(
+            "button",
+            humanText[verdict],
+            verdict === "SAME" ? "primary" : "",
+          );
+          button.append(node("kbd", key));
+          button.dataset.mutate = "true";
+          button.disabled = busy || job.state !== "READY";
+          button.addEventListener("click", () => record(verdict));
+          buttons.append(button);
+        }
+        human.append(
+          buttons,
+          node(
+            "div",
+            detail.human
+              ? "已保存：人工判断「" +
+                  humanText[detail.human] +
+                  "」。更换定位后需要重新复核。"
+              : "这一项还没有人工记录。保存后跳到当前筛选中的下一个未复核项。",
+            "save-note",
+          ),
+        );
+        root.append(human);
+        $("evidence-binding").textContent =
+          "来源 " +
+          job.pages.length +
+          " 张 · 目标 " +
+          job.total +
+          " 项 · 修订 " +
+          job.revision +
+          " · 清单与图像 SHA-256 " +
+          job.manifest_hash;
+        setBusy(busy);
+      }
+      function evidenceCard(side) {
+        const card = node("section", undefined, "evidence");
+        card.append(
+          node(
+            "div",
+            side === "left" ? "照片 A · 原图图块" : "截图 A′ · 原图图块",
+            "evidence-title",
+          ),
+        );
+        const candidates = detail.machine[side],
+          index = detail.machine[side + "_selected"],
+          c = index === null ? null : candidates[index];
+        const otherSide = side === "left" ? "right" : "left",
+          otherIndex = detail.machine[otherSide + "_selected"],
+          other =
+            otherIndex === null ? null : detail.machine[otherSide][otherIndex];
+        const crop = node("div", undefined, "crop-area");
+        if (c) {
+          const img = node("img");
+          img.src =
+            "/api/jobs/" +
+            job.job_id +
+            "/crops/" +
+            detail.ordinal +
+            "/" +
+            side +
+            "/" +
+            index +
+            ".png";
+          img.alt =
+            detail.key +
+            " " +
+            (side === "left" ? "照片" : "截图") +
+            "的候选区域";
+          img.addEventListener("error", () => {
+            crop.replaceChildren(
+              node(
+                "div",
+                "图片校验或读取失败，请停止对此项作出结论。",
+                "no-crop",
+              ),
+            );
+          });
+          crop.append(img);
+        } else
+          crop.append(
+            node(
+              "div",
+              candidates.length
+                ? "发现 " + candidates.length + " 个候选，请选择并看原图确认。"
+                : "OCR 没有定位到此编号。\n你可以查看原图并手动定位。",
+              "no-crop",
+            ),
+          );
+        card.append(crop);
+        const body = node("div", undefined, "evidence-body");
+        body.append(node("div", "OCR 观察值 · 不是人工结论", "small muted"));
+        body.append(rawValue(c?.raw || "", other?.raw ?? null));
+        if (candidates.length) {
+          const select = node("select", undefined, "candidate-select");
+          select.setAttribute(
+            "aria-label",
+            (side === "left" ? "照片 A" : "截图 A′") + "候选位置",
+          );
+          select.add(new Option("选择候选，不会自动取最高分", ""));
+          candidates.forEach((candidate, i) =>
+            select.add(
+              new Option(
+                i +
+                  1 +
+                  ". " +
+                  candidate.name +
+                  " · " +
+                  (candidate.method === "MANUAL_VALUE_REGION"
+                    ? "手动区域"
+                    : "OCR 编号候选"),
+                String(i),
+              ),
+            ),
+          );
+          select.value = index === null ? "" : String(index);
+          select.disabled = job.state !== "READY";
+          select.dataset.mutate = "true";
+          select.addEventListener("change", () => {
+            if (select.value !== "")
+              guarded(async () => {
+                await mutate("choose", {
+                  ordinal: detail.ordinal,
+                  side,
+                  candidate: Number(select.value),
+                });
+                await loadJob(job.job_id);
+              });
+          });
+          body.append(select);
+        }
+        if (c) {
+          body.append(
+            node(
+              "div",
+              c.name +
+                " · " +
+                (c.observed_id
+                  ? "候选编号 " + c.observed_id
+                  : "手动指定值区域") +
+                "\n" +
+                (c.problems.length
+                  ? c.problems.map((p) => problemText[p] || p).join("；")
+                  : "未触发当前识别拒答门，仍须看图确认"),
+              "candidate-info",
+            ),
+          );
+        }
+        const actions = node("div", undefined, "evidence-actions");
+        const original = node("button", "查看原图");
+        original.addEventListener("click", () => openImage(side, false));
+        const region = node("button", "手动定位");
+        region.disabled = job.state !== "READY";
+        region.dataset.mutate = "true";
+        region.addEventListener("click", () => openImage(side, true));
+        actions.append(original, region);
+        body.append(actions);
+        card.append(body);
+        return card;
+      }
+      async function record(verdict) {
+        if (!detail || job.state !== "READY") return;
+        await guarded(async () => {
+          const ordinal = detail.ordinal;
+          const next =
+            job.items.find((i) => i.ordinal > ordinal && i.human === null) ||
+            job.items.find((i) => i.ordinal !== ordinal && i.human === null);
+          await mutate("review", {
+            ordinal,
+            verdict,
+            reason: $("review-reason").value,
+          });
+          selected = next?.ordinal ?? ordinal;
+          await loadJob(job.job_id);
+          $("finish").disabled = !job.can_finish;
+          showMessage("已保存人工结论；机器原始提示仍保留。", "good");
+        });
+      }
+      document.addEventListener("keydown", (e) => {
+        if (
+          e.ctrlKey ||
+          e.metaKey ||
+          e.altKey ||
+          e.repeat ||
+          busy ||
+          loadingView ||
+          $("image-dialog").open ||
+          $("finish-dialog").open
+        )
+          return;
+        if (
+          ["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(
+            document.activeElement?.tagName,
+          )
+        )
+          return;
+        const map = { s: "SAME", d: "DIFFERENT", u: "UNABLE" },
+          value = map[e.key.toLowerCase()];
+        if (value && detail) {
+          e.preventDefault();
+          record(value);
+        }
+      });
+      $("filter").addEventListener("change", () => {
+        offset = 0;
+        selected = null;
+        loadJob(job.job_id).catch((e) => showMessage(e.message, "error"));
+      });
+      $("search").addEventListener("input", () => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+          offset = 0;
+          selected = null;
+          loadJob(job.job_id).catch((e) => showMessage(e.message, "error"));
+        }, 250);
+      });
+      $("previous-page").addEventListener("click", () => {
+        offset = Math.max(0, offset - 25);
+        selected = null;
+        loadJob(job.job_id).catch((e) => showMessage(e.message, "error"));
+      });
+      $("next-page").addEventListener("click", () => {
+        offset += 25;
+        selected = null;
+        loadJob(job.job_id).catch((e) => showMessage(e.message, "error"));
+      });
+      $("refresh").addEventListener("click", () =>
+        loadJob(job.job_id).catch((e) => showMessage(e.message, "error")),
+      );
+      $("cancel").addEventListener("click", () =>
+        guarded(async () => {
+          await loadJob(job.job_id);
+          await mutate("cancel");
+          await loadJob(job.job_id);
+        }),
+      );
+      $("export").addEventListener("click", () =>
+        guarded(async () => {
+          const exportJobId = job.job_id;
+          const report = await api("/api/jobs/" + exportJobId + "/export");
+          if (report.job_id !== exportJobId)
+            throw new Error("导出记录的任务标识不一致，已停止下载。");
+          const url = URL.createObjectURL(
+            new Blob([JSON.stringify(report, null, 2)], {
+              type: "application/json",
+            }),
+          );
+          const a = node("a");
+          a.href = url;
+          a.download = "ParamGuard-" + exportJobId.slice(0, 8) + ".json";
+          document.body.append(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          showMessage(
+            "已导出任务 " +
+              exportJobId.slice(0, 8) +
+              " 的完整目标、机器观察、人工记录与审计历史；导出不代表批准。",
+            "good",
+          );
+        }),
+      );
+      $("finish").addEventListener("click", () =>
+        $("finish-dialog").showModal(),
+      );
+      $("cancel-finish").addEventListener("click", () =>
+        $("finish-dialog").close(),
+      );
+      $("confirm-finish").addEventListener("click", () =>
+        guarded(async () => {
+          await mutate("finish");
+          $("finish-dialog").close();
+          await loadJob(job.job_id);
+          await histories();
+        }),
+      );
+      function updateRectangle() {
+        const box = ["box-x1", "box-y1", "box-x2", "box-y2"].map((id) =>
+          Number($(id).value),
+        );
+        const rect = $("region-rectangle");
+        rect.setAttribute("x", Math.min(box[0], box[2]));
+        rect.setAttribute("y", Math.min(box[1], box[3]));
+        rect.setAttribute("width", Math.abs(box[2] - box[0]));
+        rect.setAttribute("height", Math.abs(box[3] - box[1]));
+      }
+      function setBox(box) {
+        ["box-x1", "box-y1", "box-x2", "box-y2"].forEach(
+          (id, i) => ($(id).value = box[i]),
+        );
+        updateRectangle();
+      }
+      function showPage() {
+        const page = job.pages.find((p) => p.page_id === $("image-page").value);
+        if (!page) return;
+        modal.page = page;
+        $("original-image").src =
+          "/api/jobs/" + job.job_id + "/pages/" + page.page_id + ".png";
+        $("region-overlay").setAttribute(
+          "viewBox",
+          "0 0 " + page.width + " " + page.height,
+        );
+        zoom = 100;
+        setZoom(100);
+        setBox(
+          modal.candidate?.page_id === page.page_id
+            ? modal.candidate.value_box
+            : [0, 0, 0, 0],
+        );
+      }
+      function setZoom(value) {
+        zoom = Math.max(100, Math.min(400, value));
+        $("original-stage").style.width = zoom + "%";
+        $("zoom-label").textContent = zoom + "%";
+      }
+      function openImage(side, editing) {
+        if (busy || loadingView || !detail) return;
+        const index = detail.machine[side + "_selected"];
+        modal = {
+          side,
+          editing,
+          ordinal: detail.ordinal,
+          candidate: index === null ? null : detail.machine[side][index],
+          jobId: job.job_id,
+        };
+        const select = $("image-page");
+        select.replaceChildren();
+        for (const p of job.pages.filter((p) => p.side === side))
+          select.add(
+            new Option(p.name + " · " + p.width + "×" + p.height, p.page_id),
+          );
+        if (modal.candidate) select.value = modal.candidate.page_id;
+        $("image-title").textContent =
+          (editing ? "手动定位 · " : "查看原图 · ") + detail.key;
+        $("image-help").textContent = editing
+          ? "先确认编号，再拖出只包含该项值与单位的矩形；也可填写像素坐标。"
+          : "这里显示与 OCR 同方向的上传图像。编号和邻近行都需要人工确认。";
+        $("region-controls").hidden = !editing;
+        $("save-region").hidden = !editing;
+        $("image-message").hidden = true;
+        showPage();
+        $("image-dialog").showModal();
+      }
+      $("image-page").addEventListener("change", showPage);
+      $("zoom-in").addEventListener("click", () => setZoom(zoom + 50));
+      $("zoom-out").addEventListener("click", () => setZoom(zoom - 50));
+      for (const id of ["box-x1", "box-y1", "box-x2", "box-y2"])
+        $(id).addEventListener("input", updateRectangle);
+      $("close-image").addEventListener("click", () =>
+        $("image-dialog").close(),
+      );
+      $("cancel-image").addEventListener("click", () =>
+        $("image-dialog").close(),
+      );
+      function point(e) {
+        const bounds = $("original-image").getBoundingClientRect(),
+          page = modal.page;
+        return [
+          Math.round(
+            Math.max(
+              0,
+              Math.min(
+                page.width,
+                ((e.clientX - bounds.left) * page.width) / bounds.width,
+              ),
+            ),
+          ),
+          Math.round(
+            Math.max(
+              0,
+              Math.min(
+                page.height,
+                ((e.clientY - bounds.top) * page.height) / bounds.height,
+              ),
+            ),
+          ),
+        ];
+      }
+      $("original-stage").addEventListener("pointerdown", (e) => {
+        if (!modal?.editing || busy || !$("original-image").complete) return;
+        draw = point(e);
+        $("original-stage").setPointerCapture(e.pointerId);
+        setBox([...draw, ...draw]);
+        e.preventDefault();
+      });
+      $("original-stage").addEventListener("pointermove", (e) => {
+        if (!draw) return;
+        const p = point(e);
+        setBox([
+          Math.min(draw[0], p[0]),
+          Math.min(draw[1], p[1]),
+          Math.max(draw[0], p[0]),
+          Math.max(draw[1], p[1]),
+        ]);
+      });
+      $("original-stage").addEventListener("pointerup", () => (draw = null));
+      $("original-stage").addEventListener(
+        "pointercancel",
+        () => (draw = null),
+      );
+      $("save-region").addEventListener("click", async () => {
+        if (busy || loadingView) return;
+        setBusy(true);
+        showMessage("");
+        $("save-region").disabled = true;
+        $("image-message").hidden = true;
+        let saved = false;
+        try {
+          await mutate("region", {
+            ordinal: modal.ordinal,
+            side: modal.side,
+            page_id: modal.page.page_id,
+            box: ["box-x1", "box-y1", "box-x2", "box-y2"].map((id) =>
+              Number($(id).value),
+            ),
+          });
+          saved = true;
+          $("image-dialog").close();
+          await loadJob(job.job_id);
+          showMessage(
+            "已采用手动区域。该项需要重新看图并记录人工结论。",
+            "good",
+          );
+        } catch (e) {
+          const message = saved
+            ? "区域已保存，旧人工结论已失效，但页面刷新失败。请刷新确认后重新复核。 " +
+              e.message
+            : e.message;
+          showMessage(message, "error");
+          if ($("image-dialog").open) {
+            $("image-message").textContent = message;
+            $("image-message").hidden = false;
+          }
+        } finally {
+          setBusy(false);
+          $("save-region").disabled = false;
+        }
+      });
+      async function boot() {
+        await histories();
+        const id = location.hash.slice(1);
+        if (/^[a-f0-9]{32}$/.test(id)) await loadJob(id);
+      }
+      boot().catch((e) => showMessage(e.message, "error"));
+    </script>
+  </body>
+</html>

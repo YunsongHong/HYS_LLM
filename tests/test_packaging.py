@@ -25,10 +25,12 @@ class PackagingContractTests(unittest.TestCase):
         package_data = payload["tool"]["setuptools"]["package-data"]
 
         self.assertIn("static/*.html", package_data["paramguard"])
-        packaged_template = resources.files("paramguard").joinpath(
-            "static", "paramguard.html"
-        )
-        self.assertTrue(packaged_template.is_file())
+        for filename in ("paramguard.html", "assisted.html"):
+            with self.subTest(template=filename):
+                packaged_template = resources.files("paramguard").joinpath(
+                    "static", filename
+                )
+                self.assertTrue(packaged_template.is_file())
 
     def test_sqlite_migrations_are_declared_as_package_data(self) -> None:
         payload = tomllib.loads(
